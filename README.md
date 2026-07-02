@@ -32,9 +32,14 @@ python3 -m http.server 8777
 
 - [Three.js](https://threejs.org/) — WebGL rendering, `GLTFLoader`, `OrbitControls`, image-based lighting.
 
+## Credits
+
+The 3D iPhone models are third-party assets under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), sourced from Sketchfab. Full attribution in [CREDITS.md](CREDITS.md).
+
 ## License
 
-[MIT](LICENSE) © Quentin PLA
+Application code: [MIT](LICENSE) © Quentin PLA.
+The bundled 3D models keep their own CC BY 4.0 licenses — see [CREDITS.md](CREDITS.md).
 
 ---
 
