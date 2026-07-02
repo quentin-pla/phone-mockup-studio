@@ -799,6 +799,145 @@
                         },
                     },
                 },
+                {
+                    id: "galaxys25ultra",
+                    label: "Samsung Galaxy S25 Ultra",
+                    url: "source/samsung_galaxy_s25_ultra.glb",
+                    screenMat: "Screen", // display mesh material
+                    rot: [0, 0, 0], // glb is already height=Y with the screen facing +Z
+                    uv: {},
+                    // Match the real "Titanium Black" finish: a LIGHT silver titanium frame/rails against a
+                    // MATTE near-black rear panel (the signature two-tone look).
+                    // "Screen glass" = cover glass; its mirror reflection drops a bright blob over the
+                    //   screenshot, so make it matte + near-invisible.
+                    // "Body*" = frame/rails -> light brushed silver titanium (metallic sheen).
+                    // "Back glass" = rear panel -> matte frosted near-black (no gloss).
+                    tweaks: {
+                        "Screen glass": {
+                            roughness: 1,
+                            metalness: 0,
+                            envMapIntensity: 0,
+                            opacity: 0.03,
+                            transparent: true
+                        },
+                        // Frame/rails: reuse the iPhone 15 Pro Max's brushed-titanium normal + roughness maps
+                        // (transplanted into this glb) for realistic micro-detail, but in a LIGHTER silver
+                        // titanium. metalness/roughness stay at 1 so the maps drive the variation as multipliers.
+                        Body: {
+                            color: 0x8a8a8d,
+                            metalness: 1.0,
+                            roughness: 1.0,
+                            envMapIntensity: 0.85
+                        },
+                        "Body .001": {
+                            color: 0x848487,
+                            metalness: 1.0,
+                            roughness: 1.0,
+                            envMapIntensity: 0.85
+                        },
+                        "Body .002": {
+                            color: 0x7d7d81,
+                            metalness: 1.0,
+                            roughness: 1.0,
+                            envMapIntensity: 0.8
+                        },
+                        // Side buttons: their own material (clone of Body with the brushed maps stripped) so
+                        // they stay SMOOTH metal instead of inheriting the frame's grainy normal map.
+                        Button: {
+                            color: 0x888a8c,
+                            metalness: 0.9,
+                            roughness: 0.4,
+                            envMapIntensity: 0.8
+                        },
+                        "Back glass": {
+                            color: 0x2b2927,
+                            metalness: 0.0,
+                            roughness: 0.9,
+                            envMapIntensity: 0.15
+                        },
+                        // "Back glass flash" is the LED flash dot. The light rig washes any warm diffuse to
+                        // white, so lock it UNLIT: black base + a warm pale-yellow emissive (toneMapped off) so
+                        // it reads as a soft cream-yellow dot instead of blowing out white.
+                        "Back glass flash": {
+                            color: 0x000000,
+                            emissive: 0xf0dea0,
+                            emissiveIntensity: 1,
+                            metalness: 0.0,
+                            roughness: 1.0,
+                            envMapIntensity: 0.0,
+                            toneMapped: false
+                        },
+                        // Outer rim of each lens (+ Samsung logo): polished dark metal that catches a bright
+                        // specular reflection on its edge.
+                        "Camera body": {
+                            color: 0x232326,
+                            metalness: 1.0,
+                            roughness: 0.28,
+                            envMapIntensity: 0.85
+                        },
+                        // The ring just inside the outer rim — SAME polished metal reflection as the rim. This is
+                        // a dedicated clone of the lens "Camera" material, so the screen border (which shares the
+                        // original "Camera") does NOT get this metallic look.
+                        Camera_ring: {
+                            color: 0x232326,
+                            metalness: 1.0,
+                            roughness: 0.28,
+                            envMapIntensity: 0.85
+                        },
+                        // Front-camera punch-hole ring (split off from "Camera_ring"): pure matte black so the
+                        // light rig can't drop the two bright specular glints the metal rings show. No reflection.
+                        Camera_ring_front: {
+                            color: 0x000000,
+                            emissive: 0x000000,
+                            emissiveIntensity: 1,
+                            metalness: 0,
+                            roughness: 1,
+                            envMapIntensity: 0,
+                            toneMapped: false
+                        },
+                        // Original "Camera" = the screen's thin side-border layer + front-camera cutout rim.
+                        // Pure matte black so no metallic ring shows around the punch-hole.
+                        Camera: {
+                            color: 0x000000,
+                            emissive: 0x000000,
+                            emissiveIntensity: 1,
+                            metalness: 0,
+                            roughness: 1,
+                            envMapIntensity: 0,
+                            toneMapped: false
+                        },
+                        // Lens cover glass: fully matte + near-invisible so the flare behind shows and it drops
+                        // no bright specular band.
+                        "Camera glass": {
+                            color: 0x000000,
+                            metalness: 0,
+                            roughness: 1.0,
+                            envMapIntensity: 0.0,
+                            transparent: true,
+                            opacity: 0.04
+                        },
+                        // Inner annulus around the lens — flat unlit deep charcoal (light rig would lift it grey).
+                        Dark: {
+                            color: 0x000000,
+                            emissive: 0x141416,
+                            emissiveIntensity: 1,
+                            metalness: 0,
+                            roughness: 1,
+                            envMapIntensity: 0,
+                            toneMapped: false
+                        },
+                        // Inner lens element: base-color texture is a lens photo (black dome + blue central
+                        // glint), self-lit via emissive so the flare reads regardless of lighting.
+                        "Camera lens": {
+                            color: 0x000000,
+                            emissiveFromMap: true,
+                            emissiveIntensity: 1.0,
+                            metalness: 0.0,
+                            roughness: 1.0,
+                            envMapIntensity: 0.0
+                        }
+                    },
+                },
             ];
             let currentModel = MODELS[0];
             const EMBEDDED_MODELS = null; // standalone build replaces this with {id: base64, ...}
@@ -1475,7 +1614,19 @@
                             currentModel.tweaks && currentModel.tweaks[m.name];
                         if (tweak) {
                             for (const [k, v] of Object.entries(tweak)) {
-                                if ((k === "color" || k === "emissive") && m[k])
+                                if (k === "emissiveFromMap") {
+                                    // Promote the material's own base-color texture to an emissive map so a
+                                    // photographic detail (e.g. the lens flare) glows at a fixed brightness
+                                    // instead of depending on the light rig / view angle.
+                                    if (v && m.map) {
+                                        m.emissiveMap = m.map;
+                                        m.emissive = new THREE.Color(0xffffff);
+                                        m.toneMapped = false;
+                                    }
+                                } else if (
+                                    (k === "color" || k === "emissive") &&
+                                    m[k]
+                                )
                                     m[k] = new THREE.Color(v);
                                 else m[k] = v;
                             }
