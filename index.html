@@ -663,12 +663,13 @@
                     // This glb has NO bezel: the screen runs edge-to-edge. Composite a black border (with rounded
                     // inner corners) onto imported screenshots so it frames like the 17 Pro.
                     screenInset: { border: 26, radius: 162 },
-                    // metaL.001 = the Dynamic Island pill, rendered light gray by default. Same flat unlit black
-                    // as the 17 Pro island.
+                    // black.002 is the front black surround; its only VISIBLE part is the Dynamic Island pill (the
+                    // rest sits behind the screen/glass). By default it's lit + tone-mapped, rendering light gray —
+                    // lock it to the same flat unlit deep black as the 15 Pro Max island.
                     tweaks: {
-                        "metaL.001": {
+                        "black.002": {
                             color: 0x000000,
-                            emissive: 0x0d0d0f,
+                            emissive: 0x000000,
                             emissiveIntensity: 1,
                             metalness: 0,
                             roughness: 1,
@@ -1272,6 +1273,7 @@
                     .getCenter(new THREE.Vector3());
                 root.position.sub(center);
             }
+
 
             const bodyMats = []; // dark body materials we brighten; {mat, base:Color}
             const logoMeshes = []; // Apple-logo mesh(es), lifted off the shell to stop z-fighting
