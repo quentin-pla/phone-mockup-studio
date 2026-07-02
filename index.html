@@ -387,7 +387,7 @@
 
         <aside id="panel">
             <div id="sheet-handle"></div>
-            <h1>iPhone 15 Pro Max <span>· 3D mockup</span></h1>
+            <h1>Phone mockup <span>studio</span></h1>
 
             <div class="group">
                 <div class="group-title">iPhone model</div>
@@ -407,6 +407,46 @@
                     and rotates in 3D.
                 </div>
             </div>
+
+            <div class="divider"></div>
+
+            <details open id="filters-block">
+                <summary>Screen filters</summary>
+                <div class="group" style="margin-top: 4px">
+                    <div class="slider-row">
+                        <label>Brightness <b id="v-f-bri">100%</b></label
+                        ><input
+                            type="range"
+                            id="f-bri"
+                            min="0"
+                            max="200"
+                            value="100"
+                        />
+                    </div>
+                    <div class="slider-row">
+                        <label>Contrast <b id="v-f-con">100%</b></label
+                        ><input
+                            type="range"
+                            id="f-con"
+                            min="0"
+                            max="200"
+                            value="100"
+                        />
+                    </div>
+                    <div class="slider-row">
+                        <label>Saturation <b id="v-f-sat">100%</b></label
+                        ><input
+                            type="range"
+                            id="f-sat"
+                            min="0"
+                            max="200"
+                            value="100"
+                        />
+                    </div>
+                    <button id="btn-filters-reset">Reset filters</button>
+                    <div class="hint">Applies live to the imported screenshot.</div>
+                </div>
+            </details>
 
             <div class="divider"></div>
 
@@ -938,8 +978,6 @@
 
             function loadModelCfg(cfg) {
                 currentModel = cfg;
-                document.querySelector("#panel h1").firstChild.textContent =
-                    cfg.label + " ";
                 loaderEl.style.display = "block";
                 const onLoaded = (gltf) => {
                     clearModel();
@@ -1102,6 +1140,21 @@
 
             const fileShot = document.getElementById("file-shot");
             let lastShotImg = null; // raw imported image, kept so model switches can recompose per-model framing
+            // Live color filters applied to the imported screenshot.
+            const screenFilters = { bri: 100, con: 100, sat: 100 };
+            const FILTER_DEFAULTS = { bri: 100, con: 100, sat: 100 };
+            function filterString() {
+                const f = screenFilters;
+                return (
+                    "brightness(" +
+                    f.bri / 100 +
+                    ") contrast(" +
+                    f.con / 100 +
+                    ") saturate(" +
+                    f.sat / 100 +
+                    ")"
+                );
+            }
             // Draw the imported screenshot onto a canvas. Models whose glb lacks a bezel (screenInset) get a
             // black border with rounded inner corners composited around the screenshot.
             function composeScreenCanvas(img) {
@@ -1127,9 +1180,20 @@
                 const s = Math.max(iw / img.width, ih / img.height);
                 const dw = img.width * s,
                     dh = img.height * s;
+                g.filter = filterString(); // live brightness/contrast/saturation/warmth
                 g.drawImage(img, b + (iw - dw) / 2, b + (ih - dh) / 2, dw, dh);
+                g.filter = "none";
                 if (b) g.restore();
                 return c;
+            }
+            // Re-render the screen texture from the raw image with current filters (no-op if none loaded)
+            function refreshScreenFromShot() {
+                if (!lastShotImg) return;
+                setScreenTexture(
+                    new THREE.CanvasTexture(
+                        composeScreenCanvas(lastShotImg),
+                    ),
+                );
             }
             document.getElementById("btn-import").onclick = () =>
                 fileShot.click();
@@ -1155,6 +1219,36 @@
             document.getElementById("btn-clear-shot").onclick = () => {
                 lastShotImg = null;
                 setScreenTexture(null);
+            };
+
+            // --- Live screen filters ---
+            const filterCtl = [
+                { id: "f-bri", key: "bri", label: "v-f-bri", unit: "%" },
+                { id: "f-con", key: "con", label: "v-f-con", unit: "%" },
+                { id: "f-sat", key: "sat", label: "v-f-sat", unit: "%" },
+            ];
+            const syncFilterLabels = () => {
+                filterCtl.forEach((c) => {
+                    document.getElementById(c.label).textContent =
+                        screenFilters[c.key] + c.unit;
+                });
+            };
+            filterCtl.forEach((c) => {
+                const el = document.getElementById(c.id);
+                el.oninput = () => {
+                    screenFilters[c.key] = +el.value;
+                    document.getElementById(c.label).textContent =
+                        el.value + c.unit;
+                    refreshScreenFromShot();
+                };
+            });
+            document.getElementById("btn-filters-reset").onclick = () => {
+                Object.assign(screenFilters, FILTER_DEFAULTS);
+                filterCtl.forEach((c) => {
+                    document.getElementById(c.id).value = FILTER_DEFAULTS[c.key];
+                });
+                syncFilterLabels();
+                refreshScreenFromShot();
             };
 
             const fileModel = document.getElementById("file-model");
@@ -1616,8 +1710,18 @@
             modelSelect.onchange = () =>
                 loadModelCfg(MODELS[+modelSelect.value]);
 
-            // Boot
-            loadModelCfg(MODELS[0]);
+            // Boot: preload the default screenshot into lastShotImg so the first model (and every switch)
+            // composites it automatically via the existing recompose path. "Clear screen" still restores the
+            // model's own wallpaper.
+            const DEFAULT_SHOT_URL = "default-screenshot.jpg";
+            const bootImg = new Image();
+            bootImg.crossOrigin = "anonymous";
+            bootImg.onload = () => {
+                lastShotImg = bootImg;
+                loadModelCfg(MODELS[0]);
+            };
+            bootImg.onerror = () => loadModelCfg(MODELS[0]); // missing default → boot with model wallpaper
+            bootImg.src = DEFAULT_SHOT_URL;
         </script>
     </body>
 </html>
