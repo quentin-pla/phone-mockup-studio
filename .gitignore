@@ -10,3 +10,5 @@ textures/
 # Build scratch
 _build/
 node_modules/
+
+.idea
