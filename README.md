@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="screenshots/app-desktop.png" width="49%" alt="Phone Mockup Studio running on desktop" />
+  <a href="https://quentin-pla.github.io/phone-mockup-studio/"><img src="screenshots/app-desktop.png" width="49%" alt="Phone Mockup Studio running on desktop" /></a>
 </p>
 
 <h1 align="center">Phone Mockup Studio</h1>
@@ -9,8 +9,8 @@
 <p align="center"><strong>▶ Live app: <a href="https://quentin-pla.github.io/phone-mockup-studio/">quentin-pla.github.io/phone-mockup-studio</a></strong></p>
 
 <p align="center">
-  <img src="screenshots/mockup-portrait.png" width="24%" alt="Transparent PNG exported from the app, mobile portrait screenshot rendered on an iPhone 15 Pro Max" />
-  <img src="screenshots/mockup-landscape.png" width="24%" alt="Transparent PNG exported from the app, mobile landscape screenshot rendered on an iPhone 15 Pro Max" />
+  <a href="https://quentin-pla.github.io/phone-mockup-studio/"><img src="screenshots/mockup-portrait.png" width="24%" alt="Transparent PNG exported from the app, mobile portrait screenshot rendered on an iPhone 15 Pro Max" /></a>
+  <a href="https://quentin-pla.github.io/phone-mockup-studio/"><img src="screenshots/mockup-landscape.png" width="24%" alt="Transparent PNG exported from the app, mobile landscape screenshot rendered on an iPhone 15 Pro Max" /></a>
 </p>
 
 <p align="center"><sub>PNGs the app itself exported — mobile screenshots rendered onto an iPhone 15 Pro Max.</sub></p>
