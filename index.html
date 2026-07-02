@@ -183,13 +183,38 @@
             }
             .preset-grid {
                 display: grid;
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr;
                 gap: 8px;
             }
             .preset-grid button {
+                position: relative;
                 text-align: center;
                 padding: 10px 8px;
                 font-size: 12px;
+            }
+            .preset-grid button.active {
+                background: var(--accent);
+                border-color: var(--accent);
+                color: #fff;
+            }
+            .preset-grid button.active:hover {
+                background: var(--accent-hover);
+            }
+            /* Active-angle dot: left = normal, right = mirrored. Absolutely placed so the label stays centered. */
+            .preset-grid button.active::before {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 8px;
+                transform: translateY(-50%);
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+                background: #fff;
+            }
+            .preset-grid button.active.mirror::before {
+                left: auto;
+                right: 8px;
             }
             .slider-row {
                 display: flex;
@@ -369,6 +394,9 @@
                     font-size: 15px;
                     padding: 13px 14px;
                 }
+                .preset-grid {
+                    grid-template-columns: 1fr 1fr; /* narrow bottom sheet: keep 2 per row */
+                }
                 .preset-grid button {
                     font-size: 14px;
                     padding: 13px 8px;
@@ -430,6 +458,9 @@
                 }
                 button {
                     font-size: 14px;
+                }
+                .preset-grid {
+                    grid-template-columns: 1fr 1fr; /* narrow side panel: keep 2 per row */
                 }
                 .preset-grid button {
                     font-size: 13px;
@@ -609,6 +640,43 @@
                             value="100"
                         />
                     </div>
+                    <div class="group-title" data-i18n="rotationTitle">Rotation</div>
+                    <div class="slider-row">
+                        <label
+                            ><span data-i18n="rotationX">Axis X</span>
+                            <b id="v-rot-x">0%</b></label
+                        ><input
+                            type="range"
+                            id="rot-x"
+                            min="0"
+                            max="100"
+                            value="0"
+                        />
+                    </div>
+                    <div class="slider-row">
+                        <label
+                            ><span data-i18n="rotationY">Axis Y</span>
+                            <b id="v-rot-y">0%</b></label
+                        ><input
+                            type="range"
+                            id="rot-y"
+                            min="0"
+                            max="100"
+                            value="0"
+                        />
+                    </div>
+                    <div class="slider-row">
+                        <label
+                            ><span data-i18n="rotationZ">Axis Z</span>
+                            <b id="v-rot-z">0%</b></label
+                        ><input
+                            type="range"
+                            id="rot-z"
+                            min="0"
+                            max="100"
+                            value="0"
+                        />
+                    </div>
                     <div class="hint" data-i18n="sceneHint">
                         Drag &amp; drop a .glb onto the viewport anytime.
                     </div>
@@ -761,6 +829,10 @@
                     anglesTitle: "Ad angles",
                     btnSpin: "Toggle auto-spin",
                     sceneTitle: "Scene",
+                    rotationTitle: "Rotation",
+                    rotationX: "Axis X",
+                    rotationY: "Axis Y",
+                    rotationZ: "Axis Z",
                     sceneHint: "Drag & drop a .glb onto the viewport anytime.",
                     btnDownload: "Download PNG (transparent)",
                     btnSaveImage: "Save image",
@@ -781,11 +853,15 @@
                     presetHero: "Hero",
                     presetStraight: "Straight",
                     presetFloating: "Floating",
-                    presetTiltLeft: "Tilt left",
-                    presetTiltRight: "Tilt right",
+                    presetTilt: "Tilt",
                     presetBack: "Back",
                     presetLowAngle: "Low angle",
                     presetTopDown: "Top down",
+                    presetBackAngle: "Back angle",
+                    presetProfile: "Profile",
+                    presetDramatic: "Dramatic",
+                    presetIsometric: "Isometric",
+                    presetOverhead: "Overhead",
                 },
                 fr: {
                     name: "Français",
@@ -810,6 +886,10 @@
                     anglesTitle: "Angles publicitaires",
                     btnSpin: "Rotation automatique",
                     sceneTitle: "Scène",
+                    rotationTitle: "Rotation",
+                    rotationX: "Axe X",
+                    rotationY: "Axe Y",
+                    rotationZ: "Axe Z",
                     sceneHint:
                         "Glissez-déposez un .glb dans la zone 3D à tout moment.",
                     btnDownload: "Télécharger le PNG (transparent)",
@@ -831,11 +911,15 @@
                     presetHero: "Héros",
                     presetStraight: "Face",
                     presetFloating: "Flottant",
-                    presetTiltLeft: "Inclinaison gauche",
-                    presetTiltRight: "Inclinaison droite",
+                    presetTilt: "Inclinaison",
                     presetBack: "Dos",
                     presetLowAngle: "Contre-plongée",
                     presetTopDown: "Vue de dessus",
+                    presetBackAngle: "Dos incliné",
+                    presetProfile: "Profil",
+                    presetDramatic: "Dramatique",
+                    presetIsometric: "Isométrique",
+                    presetOverhead: "Plongée",
                 },
                 es: {
                     name: "Español",
@@ -860,6 +944,10 @@
                     anglesTitle: "Ángulos publicitarios",
                     btnSpin: "Rotación automática",
                     sceneTitle: "Escena",
+                    rotationTitle: "Rotación",
+                    rotationX: "Eje X",
+                    rotationY: "Eje Y",
+                    rotationZ: "Eje Z",
                     sceneHint:
                         "Arrastra y suelta un .glb en la vista 3D en cualquier momento.",
                     btnDownload: "Descargar PNG (transparente)",
@@ -881,11 +969,15 @@
                     presetHero: "Héroe",
                     presetStraight: "Frontal",
                     presetFloating: "Flotante",
-                    presetTiltLeft: "Inclinación izquierda",
-                    presetTiltRight: "Inclinación derecha",
+                    presetTilt: "Inclinación",
                     presetBack: "Trasera",
                     presetLowAngle: "Contrapicado",
                     presetTopDown: "Vista superior",
+                    presetBackAngle: "Trasera en ángulo",
+                    presetProfile: "Perfil",
+                    presetDramatic: "Dramático",
+                    presetIsometric: "Isométrico",
+                    presetOverhead: "Cenital",
                 },
                 de: {
                     name: "Deutsch",
@@ -910,6 +1002,10 @@
                     anglesTitle: "Werbe-Winkel",
                     btnSpin: "Auto-Drehung umschalten",
                     sceneTitle: "Szene",
+                    rotationTitle: "Rotation",
+                    rotationX: "Achse X",
+                    rotationY: "Achse Y",
+                    rotationZ: "Achse Z",
                     sceneHint:
                         "Jederzeit eine .glb-Datei in die 3D-Ansicht ziehen.",
                     btnDownload: "PNG herunterladen (transparent)",
@@ -931,11 +1027,15 @@
                     presetHero: "Hero",
                     presetStraight: "Gerade",
                     presetFloating: "Schwebend",
-                    presetTiltLeft: "Neigung links",
-                    presetTiltRight: "Neigung rechts",
+                    presetTilt: "Neigung",
                     presetBack: "Rückseite",
                     presetLowAngle: "Untersicht",
                     presetTopDown: "Draufsicht",
+                    presetBackAngle: "Rückseite schräg",
+                    presetProfile: "Profil",
+                    presetDramatic: "Dramatisch",
+                    presetIsometric: "Isometrisch",
+                    presetOverhead: "Draufsicht hoch",
                 },
                 it: {
                     name: "Italiano",
@@ -960,6 +1060,10 @@
                     anglesTitle: "Angolazioni pubblicitarie",
                     btnSpin: "Attiva/disattiva rotazione automatica",
                     sceneTitle: "Scena",
+                    rotationTitle: "Rotazione",
+                    rotationX: "Asse X",
+                    rotationY: "Asse Y",
+                    rotationZ: "Asse Z",
                     sceneHint:
                         "Trascina un .glb nella vista 3D in qualsiasi momento.",
                     btnDownload: "Scarica PNG (trasparente)",
@@ -981,11 +1085,15 @@
                     presetHero: "Hero",
                     presetStraight: "Frontale",
                     presetFloating: "Fluttuante",
-                    presetTiltLeft: "Inclinazione sinistra",
-                    presetTiltRight: "Inclinazione destra",
+                    presetTilt: "Inclinazione",
                     presetBack: "Retro",
                     presetLowAngle: "Dal basso",
                     presetTopDown: "Dall'alto",
+                    presetBackAngle: "Retro inclinato",
+                    presetProfile: "Profilo",
+                    presetDramatic: "Drammatico",
+                    presetIsometric: "Isometrico",
+                    presetOverhead: "Dall'alto in avanti",
                 },
                 pt: {
                     name: "Português",
@@ -1010,6 +1118,10 @@
                     anglesTitle: "Ângulos publicitários",
                     btnSpin: "Alternar rotação automática",
                     sceneTitle: "Cena",
+                    rotationTitle: "Rotação",
+                    rotationX: "Eixo X",
+                    rotationY: "Eixo Y",
+                    rotationZ: "Eixo Z",
                     sceneHint:
                         "Arraste e solte um .glb na vista 3D a qualquer momento.",
                     btnDownload: "Transferir PNG (transparente)",
@@ -1031,11 +1143,15 @@
                     presetHero: "Hero",
                     presetStraight: "Frontal",
                     presetFloating: "Flutuante",
-                    presetTiltLeft: "Inclinação esquerda",
-                    presetTiltRight: "Inclinação direita",
+                    presetTilt: "Inclinação",
                     presetBack: "Traseira",
                     presetLowAngle: "Ângulo baixo",
                     presetTopDown: "Vista superior",
+                    presetBackAngle: "Traseira inclinada",
+                    presetProfile: "Perfil",
+                    presetDramatic: "Dramático",
+                    presetIsometric: "Isométrico",
+                    presetOverhead: "Vista de cima",
                 },
                 ja: {
                     name: "日本語",
@@ -1060,6 +1176,10 @@
                     anglesTitle: "広告アングル",
                     btnSpin: "自動回転の切り替え",
                     sceneTitle: "シーン",
+                    rotationTitle: "回転",
+                    rotationX: "X軸",
+                    rotationY: "Y軸",
+                    rotationZ: "Z軸",
                     sceneHint: ".glbファイルをいつでもビューポートにドラッグ＆ドロップできます。",
                     btnDownload: "PNGをダウンロード（透過）",
                     btnSaveImage: "画像を保存",
@@ -1080,11 +1200,15 @@
                     presetHero: "ヒーロー",
                     presetStraight: "正面",
                     presetFloating: "浮遊",
-                    presetTiltLeft: "左に傾ける",
-                    presetTiltRight: "右に傾ける",
+                    presetTilt: "傾ける",
                     presetBack: "背面",
                     presetLowAngle: "ローアングル",
                     presetTopDown: "上から",
+                    presetBackAngle: "背面アングル",
+                    presetProfile: "側面",
+                    presetDramatic: "ドラマチック",
+                    presetIsometric: "アイソメ",
+                    presetOverhead: "俯瞰",
                 },
                 zh: {
                     name: "中文",
@@ -1109,6 +1233,10 @@
                     anglesTitle: "广告角度",
                     btnSpin: "切换自动旋转",
                     sceneTitle: "场景",
+                    rotationTitle: "旋转",
+                    rotationX: "X 轴",
+                    rotationY: "Y 轴",
+                    rotationZ: "Z 轴",
                     sceneHint: "随时将 .glb 文件拖放到视口中。",
                     btnDownload: "下载 PNG（透明）",
                     btnSaveImage: "保存图片",
@@ -1128,11 +1256,15 @@
                     presetHero: "主视觉",
                     presetStraight: "正面",
                     presetFloating: "悬浮",
-                    presetTiltLeft: "左倾",
-                    presetTiltRight: "右倾",
+                    presetTilt: "倾斜",
                     presetBack: "背面",
                     presetLowAngle: "低角度",
                     presetTopDown: "俯视",
+                    presetBackAngle: "背面角度",
+                    presetProfile: "侧面",
+                    presetDramatic: "戏剧性",
+                    presetIsometric: "等距",
+                    presetOverhead: "俯瞰",
                 },
             };
             const LANG_STORAGE_KEY = "phoneMockupStudio.lang";
@@ -1200,10 +1332,13 @@
             );
             camera.position.set(0, 0, 6);
 
+            // Camera stays fixed facing -Z. OrbitControls is kept for zoom only (dolly + pinch); rotation is
+            // handled by the arcball on the model, so there is no camera orbit and thus no pole gimbal.
             const controls = new OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.08;
             controls.enablePan = false;
+            controls.enableRotate = false; // the phone tumbles, not the camera
             controls.minDistance = 2.2;
             controls.maxDistance = 14;
 
@@ -1240,13 +1375,24 @@
             scene.add(new THREE.AmbientLight(0xffffff, 0.35));
 
             // --- Model rig ---
-            // orientRig: portrait/landscape device roll only (Z axis). Wraps rig so ad-angle presets and
-            // auto-spin (which drive rig's own rotation) stay completely independent of device orientation.
+            // The camera is locked facing -Z; the PHONE tumbles in place (arcball) so a drag always tips it
+            // in the drag direction, at any angle, with no pole/gimbal roll. Compose chain, outer to inner:
+            //   orientRig (portrait/landscape roll about view Z)
+            //     └ arcball (free tumble quaternion driven by drag + presets)
+            //         └ rig  (auto-spin yaw about the phone's own up axis)
+            //             └ modelGroup (each glb's base orientation from fitModel)
             const orientRig = new THREE.Group();
             scene.add(orientRig);
-            const rig = new THREE.Group(); // everything rotates together
-            orientRig.add(rig);
+            const arcball = new THREE.Group(); // free-tumble orientation (quaternion)
+            orientRig.add(arcball);
+            const rig = new THREE.Group(); // auto-spin only
+            arcball.add(rig);
             let modelGroup = null;
+
+            // Arcball state: qArc is where the phone is; qArcTarget is where it's easing to (preset tweens
+            // and drag both write qArcTarget; the render loop slerps qArc toward it for consistent damping).
+            const qArc = new THREE.Quaternion();
+            const qArcTarget = new THREE.Quaternion();
 
             // Each model's screen material (currentModel.screenMat) gets its emissiveMap swapped with the
             // imported screenshot for pixel-perfect UV alignment.
@@ -1574,7 +1720,10 @@
                     statusEl.textContent = found
                         ? t("statusModelLoaded", { name: cfg.label })
                         : t("statusScreenNotFound");
+                    lastPreset = presets[0];
+                    lastMirror = false;
                     applyPreset(presets[0]);
+                    highlightActivePreset();
                 };
                 const onError = (err) => {
                     loaderEl.innerHTML =
@@ -1635,20 +1784,12 @@
                     rz: -0.12,
                 },
                 {
-                    nameKey: "presetTiltLeft",
+                    nameKey: "presetTilt",
                     az: 34,
                     el: 6,
                     dist: 6.1,
                     ry: 0.45,
                     rz: 0.14,
-                },
-                {
-                    nameKey: "presetTiltRight",
-                    az: -34,
-                    el: 6,
-                    dist: 6.1,
-                    ry: -0.45,
-                    rz: -0.14,
                 },
                 { nameKey: "presetBack", az: 180, el: 6, dist: 6.2, ry: 0.0, rz: 0.0 },
                 {
@@ -1667,41 +1808,102 @@
                     ry: 0.0,
                     rz: 0.0,
                 },
+                {
+                    nameKey: "presetBackAngle",
+                    az: 205,
+                    el: 10,
+                    dist: 6.3,
+                    ry: -0.3,
+                    rz: 0.1,
+                },
+                {
+                    nameKey: "presetProfile",
+                    az: 90,
+                    el: 0,
+                    dist: 5.8,
+                    ry: 0.0,
+                    rz: 0.0,
+                },
+                {
+                    nameKey: "presetDramatic",
+                    az: -22,
+                    el: -30,
+                    dist: 6.4,
+                    ry: -0.35,
+                    rz: -0.1,
+                },
+                {
+                    nameKey: "presetIsometric",
+                    az: 30,
+                    el: 30,
+                    dist: 6.6,
+                    ry: 0.2,
+                    rz: 0.0,
+                },
+                {
+                    nameKey: "presetOverhead",
+                    az: -18,
+                    el: 38,
+                    dist: 6.7,
+                    ry: -0.22,
+                    rz: -0.08,
+                },
             ];
 
-            let anim = null;
-            function applyPreset(p) {
-                setAutoSpin(false);
-                // Drive OrbitControls via its spherical target so damping stays consistent
+            // Turn a preset's camera orbit (az/el) + model lean (ry/rz) into a single arcball quaternion.
+            // The camera is locked, so instead of orbiting the camera we rotate the phone by the INVERSE of
+            // where the camera used to sit, then apply the ad-style model lean on top.
+            // The phone's default (identity) orientation shows its BACK to the locked camera; every preset's
+            // az is measured from the FRONT, so a fixed 180° yaw brings the screen to face the camera first.
+            const Q_FRONT = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI, 0));
+            const _presetEye = new THREE.Object3D();
+            function presetQuaternion(p) {
                 const azr = THREE.MathUtils.degToRad(p.az);
-                const polar = THREE.MathUtils.degToRad(90 - p.el); // el 0 => equator
-                const start = {
-                    az: controls.getAzimuthalAngle(),
-                    pol: controls.getPolarAngle(),
-                    dist: camera.position.distanceTo(controls.target),
-                    ry: rig.rotation.y,
-                    rz: rig.rotation.z,
-                };
+                const polar = THREE.MathUtils.degToRad(90 - p.el);
+                const sinP = Math.sin(polar);
+                // Reconstruct the old orbit camera orientation, then invert it: rotating the model by the
+                // inverse reproduces the exact same on-screen view with a fixed camera.
+                _presetEye.position.set(sinP * Math.sin(azr), Math.cos(polar), sinP * Math.cos(azr));
+                _presetEye.up.set(0, 1, 0);
+                _presetEye.lookAt(0, 0, 0);
+                _presetEye.updateMatrixWorld(true);
+                const q = _presetEye.quaternion.clone().invert();
+                q.multiply(Q_FRONT);
+                // Model lean (ry about Y, rz about Z) was applied inside the rig; fold it into the target.
+                q.multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(0, p.ry, p.rz, "YXZ")));
+                return q;
+            }
+
+            // Clicking a preset the first time applies it; clicking the SAME preset again applies the
+            // left-right mirror of that angle (and toggles back on a third press). Mirroring flips the pose
+            // horizontally: negate the azimuth and the model lean.
+            let lastPreset = null;
+            let lastMirror = false;
+            function mirrorPreset(p) {
+                return { ...p, az: -p.az, ry: -p.ry, rz: -p.rz };
+            }
+
+            let anim = null;
+            function applyPreset(p, mirror) {
+                setAutoSpin(false);
+                const src = mirror ? mirrorPreset(p) : p;
+                const qFrom = qArcTarget.clone();
+                const qTo = presetQuaternion(src);
+                const startDist = camera.position.distanceTo(controls.target);
                 const t0 = performance.now(),
                     dur = 700;
                 cancelAnimationFrame(anim);
                 function tween(now) {
                     const k = Math.min(1, (now - t0) / dur);
                     const e = 1 - Math.pow(1 - k, 3); // easeOutCubic
-                    const az = start.az + (azr - start.az) * e;
-                    const pol = start.pol + (polar - start.pol) * e;
-                    const dist = start.dist + (p.dist - start.dist) * e;
-                    const sinP = Math.sin(pol);
-                    camera.position.set(
-                        controls.target.x + dist * sinP * Math.sin(az),
-                        controls.target.y + dist * Math.cos(pol),
-                        controls.target.z + dist * sinP * Math.cos(az),
-                    );
-                    camera.lookAt(controls.target);
-                    rig.rotation.y = start.ry + (p.ry - start.ry) * e;
-                    rig.rotation.z = start.rz + (p.rz - start.rz) * e;
+                    // Slerp the target orientation; the render loop eases qArc toward it.
+                    qArcTarget.copy(qFrom).slerp(qTo, e);
+                    // Dolly the locked camera in/out for the preset's framing.
+                    const dist = startDist + (src.dist - startDist) * e;
+                    camera.position.normalize().multiplyScalar(dist);
                     controls.update();
                     if (k < 1) anim = requestAnimationFrame(tween);
+                    else syncSlidersFromArc(); // reflect the preset's final angle in the sliders
                 }
                 anim = requestAnimationFrame(tween);
             }
@@ -1737,21 +1939,51 @@
 
             // Build preset buttons (rebuildable so a language switch re-renders their labels)
             const presetWrap = document.getElementById("presets");
+            const presetButtons = new Map(); // preset object -> its <button>, for highlighting the active one
+
+            // The highlight is driven ONLY by explicit preset clicks (via lastPreset) — never by comparing
+            // the current orientation to preset angles. So rotating the phone manually to an angle that
+            // happens to match a preset does NOT light up that button.
+            function highlightActivePreset() {
+                presetButtons.forEach((btn, preset) => {
+                    const on = preset === lastPreset;
+                    btn.classList.toggle("active", on);
+                    // Dot side reflects mirror state: left = normal, right = mirrored.
+                    btn.classList.toggle("mirror", on && lastMirror);
+                });
+            }
+
             function buildPresetButtons() {
                 presetWrap.innerHTML = "";
+                presetButtons.clear();
                 presets.forEach((p) => {
                     const b = document.createElement("button");
                     b.textContent = t(p.nameKey);
-                    b.onclick = () => applyPreset(p);
+                    b.onclick = () => {
+                        // Same button again → mirror (and toggle back on the next press); a different
+                        // button → fresh, un-mirrored.
+                        lastMirror = lastPreset === p ? !lastMirror : false;
+                        lastPreset = p;
+                        applyPreset(p, lastMirror);
+                        highlightActivePreset();
+                    };
+                    presetButtons.set(p, b);
                     presetWrap.appendChild(b);
                 });
+                highlightActivePreset(); // preserve highlight across language rebuilds
             }
             buildPresetButtons();
 
             // --- UI wiring ---
             let autoSpin = false;
+            let spinY = 0; // fractional Y-slider position (%) while auto-spinning, for smooth 0->100 looping
             const btnSpinEl = document.getElementById("btn-spin");
             function setAutoSpin(v) {
+                if (v && !autoSpin) {
+                    spinY = +rotEls.y.value; // resume the ramp from the current Y position
+                    lastPreset = null; // spinning away from a preset clears its highlight
+                    highlightActivePreset();
+                }
                 autoSpin = v;
                 btnSpinEl.classList.toggle("active", v);
             }
@@ -2120,6 +2352,67 @@
                 document.getElementById("v-env").textContent = v + "%";
             };
 
+            // --- Manual rotation sliders (Scene section): each axis 0..100% maps to 0..360° ---
+            // They write the arcball target directly; conversely, dragging the phone / picking a preset
+            // syncs the slider positions back so the two input methods always agree.
+            const rotEls = {
+                x: document.getElementById("rot-x"),
+                y: document.getElementById("rot-y"),
+                z: document.getElementById("rot-z")
+            };
+            const rotVals = {
+                x: document.getElementById("v-rot-x"),
+                y: document.getElementById("v-rot-y"),
+                z: document.getElementById("v-rot-z")
+            };
+            const _rotEuler = new THREE.Euler(0, 0, 0, "XYZ");
+            let editingRotSlider = false; // true while the user drags a slider, to suppress sync-back
+
+            // Write a slider's value + label without re-firing its oninput (so programmatic updates from
+            // drag/auto-spin don't recurse back through applyRotationFromSliders).
+            function setRotSlider(axis, pct) {
+                const v = ((Math.round(pct) % 100) + 100) % 100; // wrap into [0,100)
+                if (+rotEls[axis].value !== v) {
+                    rotEls[axis].value = v;
+                    rotVals[axis].textContent = v + "%";
+                }
+            }
+
+            // The sliders are the source of truth for orientation: rebuild the arcball target from all three.
+            function applyRotationFromSliders() {
+                const rx = (rotEls.x.value / 100) * Math.PI * 2;
+                const ry = (rotEls.y.value / 100) * Math.PI * 2;
+                const rz = (rotEls.z.value / 100) * Math.PI * 2;
+                _rotEuler.set(rx, ry, rz, "XYZ");
+                qArcTarget.setFromEuler(_rotEuler);
+            }
+
+            // After a free-tumble drag (or a preset), decompose the resulting orientation back to X/Y/Z % so
+            // the sliders reflect it. Only meaningful as a one-shot at rest — Euler decomposition of a moving
+            // free rotation is not monotonic, so it must NOT be called every frame during auto-spin.
+            function syncSlidersFromArc() {
+                if (editingRotSlider) return;
+                _rotEuler.setFromQuaternion(qArcTarget, "XYZ");
+                const pct = (rad) => (((rad / (Math.PI * 2)) % 1) + 1) % 1;
+                setRotSlider("x", pct(_rotEuler.x) * 100);
+                setRotSlider("y", pct(_rotEuler.y) * 100);
+                setRotSlider("z", pct(_rotEuler.z) * 100);
+            }
+
+            ["x", "y", "z"].forEach((axis) => {
+                const el = rotEls[axis];
+                el.addEventListener("pointerdown", () => (editingRotSlider = true));
+                window.addEventListener("pointerup", () => (editingRotSlider = false));
+                el.oninput = (e) => {
+                    setAutoSpin(false);
+                    cancelAnimationFrame(anim); // a manual rotation overrides any running preset tween
+                    lastPreset = null; // manual slider edit breaks the preset mirror-toggle chain
+                    highlightActivePreset(); // and clears the active-angle highlight
+                    rotVals[axis].textContent = e.target.value + "%";
+                    applyRotationFromSliders();
+                };
+            });
+
             // Drag & drop model
             const stage = document.getElementById("stage");
             const dropNote = document.getElementById("drop-note");
@@ -2338,10 +2631,108 @@
                 stageEl.addEventListener("mouseup", sEnd);
             })();
 
+            // --- Arcball drag: tumble the phone in the drag direction, any angle, no poles ---
+            // Screen-space trackball: map the pointer onto a virtual sphere, then rotate qArcTarget by the
+            // shortest arc between successive projected points. The rotation axis is derived in CAMERA space
+            // and converted to world, so "drag right" always yaws about the screen-up axis and "drag up"
+            // always pitches about the screen-right axis, regardless of the phone's current orientation.
+            const TRACKBALL_RADIUS = 1.1; // >1 keeps the mapping on the ball's near hemisphere (no hyperbola seam)
+            const DRAG_GAIN = 2.2; // multiplies the per-drag rotation so a small swipe turns the phone a lot
+            const dragState = { active: false, x: 0, y: 0 };
+            const _camRight = new THREE.Vector3();
+            const _camUp = new THREE.Vector3();
+            const _axis = new THREE.Vector3();
+            const _dq = new THREE.Quaternion();
+
+            function projectTrackball(nx, ny) {
+                // nx,ny in [-1,1]. z on the sphere (or hyperbolic sheet far out) — classic Holroyd/Bell ball.
+                const d2 = nx * nx + ny * ny;
+                const r2 = TRACKBALL_RADIUS * TRACKBALL_RADIUS;
+                const z = d2 <= r2 * 0.5 ? Math.sqrt(r2 - d2) : (r2 * 0.5) / Math.sqrt(d2);
+                return new THREE.Vector3(nx, ny, z).normalize();
+            }
+
+            function ndcFromEvent(e) {
+                const r = renderer.domElement.getBoundingClientRect();
+                const p = e.touches ? e.touches[0] : e;
+                return [
+                    ((p.clientX - r.left) / r.width) * 2 - 1,
+                    -(((p.clientY - r.top) / r.height) * 2 - 1)
+                ];
+            }
+
+            function applyDrag(nxPrev, nyPrev, nx, ny) {
+                const a = projectTrackball(nxPrev, nyPrev);
+                const b = projectTrackball(nx, ny);
+                // Rotation in camera space: axis = a × b, angle = angle(a,b).
+                _axis.crossVectors(a, b);
+                const len = _axis.length();
+                if (len < 1e-6) return;
+                _axis.divideScalar(len);
+                const angle = Math.acos(Math.min(1, a.dot(b))) * DRAG_GAIN;
+                // Convert the camera-space axis to world space using the camera's basis vectors.
+                camera.matrixWorld.extractBasis(_camRight, _camUp, new THREE.Vector3());
+                const worldAxis = _camRight
+                    .clone()
+                    .multiplyScalar(_axis.x)
+                    .addScaledVector(_camUp, _axis.y)
+                    .addScaledVector(camera.getWorldDirection(new THREE.Vector3()), -_axis.z)
+                    .normalize();
+                _dq.setFromAxisAngle(worldAxis, angle);
+                // Pre-multiply so the drag is applied in world/view space on top of the current orientation.
+                qArcTarget.premultiply(_dq);
+            }
+
+            const canvasEl = renderer.domElement;
+            const onDragStart = (e) => {
+                if (e.button !== undefined && e.button !== 0) return;
+                setAutoSpin(false);
+                cancelAnimationFrame(anim); // stop any preset tween; the drag now owns qArcTarget
+                lastPreset = null; // a manual drag breaks the preset mirror-toggle chain
+                highlightActivePreset(); // and clears the active-angle highlight
+                const [nx, ny] = ndcFromEvent(e);
+                dragState.active = true;
+                dragState.x = nx;
+                dragState.y = ny;
+            };
+            const onDragMove = (e) => {
+                if (!dragState.active) return;
+                const [nx, ny] = ndcFromEvent(e);
+                applyDrag(dragState.x, dragState.y, nx, ny);
+                dragState.x = nx;
+                dragState.y = ny;
+            };
+            const onDragEnd = () => {
+                if (!dragState.active) return;
+                dragState.active = false;
+                syncSlidersFromArc(); // one-shot: reflect the new resting orientation in the sliders
+            };
+            canvasEl.addEventListener("pointerdown", onDragStart);
+            window.addEventListener("pointermove", onDragMove);
+            window.addEventListener("pointerup", onDragEnd);
+            canvasEl.addEventListener("pointercancel", onDragEnd);
+
             // Render loop
             function tick() {
                 requestAnimationFrame(tick);
-                if (autoSpin) rig.rotation.y += 0.006;
+                if (autoSpin) {
+                    // Auto-spin advances the Y slider itself (looping 0->100), and the orientation is rebuilt
+                    // from the sliders — so the Y slider visibly ramps 0%->100% instead of the Euler readback
+                    // jumping around. X and Z hold whatever they were set to. The orientation uses the
+                    // fractional spinY (not the rounded slider) so the motion stays smooth between whole %.
+                    spinY = (spinY + 0.18) % 100;
+                    setRotSlider("y", spinY);
+                    _rotEuler.set(
+                        (rotEls.x.value / 100) * Math.PI * 2,
+                        (spinY / 100) * Math.PI * 2,
+                        (rotEls.z.value / 100) * Math.PI * 2,
+                        "XYZ"
+                    );
+                    qArcTarget.setFromEuler(_rotEuler);
+                }
+                // Ease the live orientation toward the target for consistent damping on both drag and presets.
+                qArc.slerp(qArcTarget, dragState.active || autoSpin ? 1 : 0.18);
+                arcball.quaternion.copy(qArc);
                 controls.update();
                 renderer.render(scene, camera);
             }
