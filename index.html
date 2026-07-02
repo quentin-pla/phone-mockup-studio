@@ -1,0 +1,1623 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>iPhone 15 Pro — 3D screenshot mockup</title>
+        <style>
+            :root {
+                --bg: #ffffff;
+                --panel: #1e1e26;
+                --panel-2: #262631;
+                --border: #34343f;
+                --text: #e8e8ee;
+                --text-dim: #9a9aa8;
+                --accent: #6b6bff;
+                --accent-hover: #8080ff;
+                --radius: 10px;
+            }
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            html,
+            body {
+                height: 100%;
+            }
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+                    sans-serif;
+                background: var(--bg);
+                color: var(--text);
+                overflow: hidden;
+                display: flex;
+            }
+            #stage {
+                position: relative;
+                flex: 1;
+                min-width: 0;
+            }
+            #canvas-wrap {
+                position: absolute;
+                inset: 0;
+            }
+            canvas {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+
+            #panel {
+                width: 300px;
+                flex-shrink: 0;
+                background: var(--panel);
+                border-left: 1px solid var(--border);
+                padding: 18px;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+            }
+            h1 {
+                font-size: 15px;
+                font-weight: 600;
+                letter-spacing: 0.2px;
+            }
+            h1 span {
+                color: var(--text-dim);
+                font-weight: 400;
+            }
+            .group {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .group-title {
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+                color: var(--text-dim);
+                font-weight: 600;
+            }
+            button,
+            select {
+                font: inherit;
+                font-size: 13px;
+                background: var(--panel-2);
+                color: var(--text);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 9px 12px;
+                cursor: pointer;
+                transition:
+                    background 0.12s,
+                    border-color 0.12s;
+                text-align: left;
+            }
+            select {
+                width: 100%;
+                -webkit-appearance: none;
+                appearance: none;
+                background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%239a9aa8' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
+                background-repeat: no-repeat;
+                background-position: right 12px center;
+            }
+            button:hover {
+                background: #303040;
+                border-color: #45455a;
+            }
+            button:active {
+                transform: scale(0.985);
+            }
+            button.primary {
+                background: var(--accent);
+                border-color: var(--accent);
+                color: #fff;
+            }
+            button.primary:hover {
+                background: var(--accent-hover);
+            }
+            .preset-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .preset-grid button {
+                text-align: center;
+                padding: 10px 8px;
+                font-size: 12px;
+            }
+            .slider-row {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+            .slider-row label {
+                font-size: 12px;
+                color: var(--text-dim);
+                display: flex;
+                justify-content: space-between;
+            }
+            .slider-row label b {
+                color: var(--text);
+                font-weight: 500;
+                font-variant-numeric: tabular-nums;
+            }
+            input[type="range"] {
+                width: 100%;
+                accent-color: var(--accent);
+            }
+            .hint {
+                font-size: 11px;
+                color: var(--text-dim);
+                line-height: 1.5;
+            }
+            #drop-note {
+                position: absolute;
+                inset: 0;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                background: rgba(10, 10, 16, 0.78);
+                z-index: 10;
+                font-size: 16px;
+                color: var(--text);
+                pointer-events: none;
+                border: 2px dashed var(--accent);
+            }
+            #loader {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: var(--text-dim);
+                font-size: 14px;
+                z-index: 5;
+                text-align: center;
+            }
+            .spinner {
+                width: 28px;
+                height: 28px;
+                margin: 0 auto 10px;
+                border: 3px solid var(--border);
+                border-top-color: var(--accent);
+                border-radius: 50%;
+                animation: spin 0.8s linear infinite;
+            }
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+            .divider {
+                height: 1px;
+                background: var(--border);
+            }
+            details summary {
+                cursor: pointer;
+                font-size: 12px;
+                color: var(--text-dim);
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+                user-select: none;
+            }
+            details[open] summary {
+                margin-bottom: 8px;
+            }
+            .row-2 {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            #sheet-handle {
+                display: none;
+            }
+
+            /* ---- Mobile PORTRAIT: fullscreen 3D + iOS-style bottom sheet ---- */
+            @media (max-width: 760px) and (orientation: portrait),
+                (pointer: coarse) and (orientation: portrait) {
+                :root {
+                    --peek: 128px;
+                    --sheet-h: 68vh;
+                } /* collapsed peek + opened sheet height */
+                html,
+                body {
+                    background: #ffffff;
+                } /* white shows through the sheet's rounded corners */
+                body {
+                    display: block;
+                }
+                /* White backdrop fills the whole viewport so nothing dark shows behind the sheet corners */
+                #stage {
+                    position: fixed;
+                    inset: 0;
+                    background: #ffffff;
+                }
+                #canvas-wrap {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    top: 0;
+                    bottom: var(--peek);
+                }
+
+                #panel {
+                    position: fixed;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    width: 100%;
+                    height: var(--sheet-h);
+                    max-height: var(--sheet-h);
+                    border-left: none;
+                    border-top: 1px solid var(--border);
+                    border-radius: 18px 18px 0 0;
+                    box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.12); /* subtle edge, no dark smear on the white bg */
+                    padding: 0 18px calc(18px + env(safe-area-inset-bottom))
+                        18px;
+                    gap: 16px;
+                    z-index: 20;
+                    /* Collapsed by default: only the handle + a peek row show above the fold */
+                    transform: translateY(calc(var(--sheet-h) - var(--peek)));
+                    transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+                    overflow-y: auto;
+                    -webkit-overflow-scrolling: touch;
+                    overscroll-behavior: contain;
+                    touch-action: pan-y; /* allow the sheet body to scroll */
+                }
+                #panel.expanded {
+                    transform: translateY(0);
+                }
+                #panel.dragging {
+                    transition: none;
+                    overflow-y: hidden;
+                }
+
+                #sheet-handle {
+                    display: block;
+                    position: sticky;
+                    top: 0;
+                    margin: 0 -18px 8px;
+                    padding: 12px 0 10px;
+                    background: var(--panel);
+                    border-radius: 18px 18px 0 0;
+                    cursor: grab;
+                    z-index: 3;
+                    touch-action: none; /* the handle is the drag zone */
+                    flex-shrink: 0;
+                }
+                #sheet-handle::before {
+                    content: "";
+                    display: block;
+                    width: 40px;
+                    height: 5px;
+                    margin: 0 auto;
+                    background: #4a4a58;
+                    border-radius: 3px;
+                }
+
+                #panel h1 {
+                    display: none;
+                }
+                button {
+                    font-size: 15px;
+                    padding: 13px 14px;
+                }
+                .preset-grid button {
+                    font-size: 14px;
+                    padding: 13px 8px;
+                }
+                input[type="range"] {
+                    height: 28px;
+                }
+            }
+
+            /* ---- Mobile LANDSCAPE: 3D on the left, scrollable panel on the right ---- */
+            @media (pointer: coarse) and (orientation: landscape),
+                (max-height: 560px) and (orientation: landscape) {
+                body {
+                    display: flex;
+                    height: 100vh;
+                    height: 100dvh;
+                }
+                #sheet-handle {
+                    display: none;
+                }
+                #stage {
+                    position: relative;
+                    flex: 1;
+                    min-width: 0;
+                    height: 100vh;
+                    height: 100dvh;
+                    background: #ffffff;
+                }
+                #canvas-wrap {
+                    position: absolute;
+                    inset: 0;
+                } /* full height — no bottom-sheet inset in landscape */
+                #panel {
+                    position: relative;
+                    transform: none;
+                    width: 290px;
+                    /* 100dvh = the ACTUAL visible height on iOS Safari (100vh over-measures in landscape,
+         pushing the last items below the fold with nothing to scroll them up) */
+                    height: 100vh;
+                    height: 100dvh;
+                    max-height: 100vh;
+                    max-height: 100dvh;
+                    border-left: 1px solid var(--border);
+                    border-top: none;
+                    border-radius: 0;
+                    box-shadow: none;
+                    overflow-y: auto;
+                    -webkit-overflow-scrolling: touch;
+                    overscroll-behavior: contain;
+                    touch-action: pan-y;
+                    /* Extra bottom padding clears iOS Safari's collapsing toolbar so the last item is always reachable */
+                    padding: 16px 16px calc(80px + env(safe-area-inset-bottom))
+                        16px;
+                    padding-right: calc(16px + env(safe-area-inset-right));
+                    gap: 14px;
+                }
+                #panel h1 {
+                    display: none;
+                }
+                button {
+                    font-size: 14px;
+                }
+                .preset-grid button {
+                    font-size: 13px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="stage">
+            <div id="canvas-wrap"></div>
+            <div id="loader">
+                <div class="spinner"></div>
+                Loading iPhone 15 Pro…
+            </div>
+            <div id="drop-note">Drop a .glb model here</div>
+        </div>
+
+        <aside id="panel">
+            <div id="sheet-handle"></div>
+            <h1>iPhone 15 Pro Max <span>· 3D mockup</span></h1>
+
+            <div class="group">
+                <div class="group-title">iPhone model</div>
+                <select id="model-select"></select>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="group">
+                <div class="group-title">Screen capture</div>
+                <button class="primary" id="btn-import">
+                    <i></i>Import screenshot…
+                </button>
+                <button id="btn-clear-shot">Clear screen</button>
+                <div class="hint">
+                    Use an iPhone screenshot (portrait). It maps onto the glass
+                    and rotates in 3D.
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="group">
+                <div class="group-title">Ad angles</div>
+                <div class="preset-grid" id="presets"></div>
+                <button id="btn-spin">Toggle auto-spin</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <details open>
+                <summary>Scene</summary>
+                <div class="group" style="margin-top: 4px">
+                    <div class="slider-row">
+                        <label>Brightness <b id="v-env">100%</b></label
+                        ><input
+                            type="range"
+                            id="env"
+                            min="30"
+                            max="220"
+                            value="100"
+                        />
+                    </div>
+                    <button id="btn-model">Load different .glb…</button>
+                    <div class="hint">
+                        Drag &amp; drop a .glb onto the viewport anytime.
+                    </div>
+                </div>
+            </details>
+
+            <div
+                style="
+                    margin-top: auto;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                "
+            >
+                <div class="hint" id="status"></div>
+                <button class="primary" id="btn-download">
+                    <i></i>Download PNG (transparent)
+                </button>
+            </div>
+        </aside>
+
+        <input type="file" id="file-shot" accept="image/*" hidden />
+        <input
+            type="file"
+            id="file-model"
+            accept=".glb,.gltf,model/gltf-binary"
+            hidden
+        />
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+                }
+            }
+        </script>
+
+        <script type="module">
+            import * as THREE from "three";
+            import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+            import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+            import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+            // Selectable iPhone models. rot = model-space rotation making height=Y and screen face +Z.
+            // uv = extra transform applied to imported screenshots (each glb maps its screen differently).
+            // fixes15 = aggressive material passes tuned for the 15 Pro Max glb only.
+            const MODELS = [
+                {
+                    id: "ip15promax",
+                    label: "iPhone 15 Pro Max",
+                    url: "source/apple_iphone_15_pro_max_black(2).glb",
+                    screenMat: "pIJKfZsazmcpEiU",
+                    rot: [0, Math.PI, 0],
+                    uv: { rot: Math.PI, mirrorX: true },
+                    fixes15: true,
+                },
+                {
+                    id: "ip17promax",
+                    label: "iPhone 17 Pro Max",
+                    url: "source/iphone_17_pro_max.glb",
+                    screenMat: "screen.001",
+                    rot: [0, Math.PI / 2, 0],
+                    // Visible face of the screen mesh samples u -0.9528..0.0197, v 0.0019..1.0019 (the other
+                    // face is inside). Affine-remap that window to the full canvas; negative scale = the 180° flip.
+                    uv: {
+                        repeat: [-1.028278, -1],
+                        offset: [0.020257, 1.0019],
+                        clamp: true,
+                    },
+                    // This glb has NO bezel: the screen runs edge-to-edge. Composite a black border (with rounded
+                    // inner corners) onto imported screenshots so it frames like the 17 Pro.
+                    screenInset: { border: 26, radius: 162 },
+                    // metaL.001 = the Dynamic Island pill, rendered light gray by default. Same flat unlit black
+                    // as the 17 Pro island.
+                    tweaks: {
+                        "metaL.001": {
+                            color: 0x000000,
+                            emissive: 0x0d0d0f,
+                            emissiveIntensity: 1,
+                            metalness: 0,
+                            roughness: 1,
+                            envMapIntensity: 0,
+                            toneMapped: false,
+                        },
+                    },
+                },
+                {
+                    id: "ip17pro",
+                    label: "iPhone 17 Pro",
+                    url: "source/iphone_17_pro.glb",
+                    screenMat: "OLED",
+                    rot: [0, Math.PI, 0],
+                    uv: { mirrorX: true },
+                    // Glass: front cover is a 25% black film with mirror roughness — it grays the screenshot out
+                    // and catches a big specular blob. Make it near-invisible and reflection-free.
+                    // Display_Frame (bezel ring) + OLED_off (Dynamic Island pill) are glossy black: lock them to
+                    // flat unlit deep black so no light reflects on the screen borders or the island.
+                    tweaks: {
+                        Glass: {
+                            roughness: 1,
+                            metalness: 0,
+                            envMapIntensity: 0,
+                            opacity: 0.03,
+                        },
+                        Display_Frame: {
+                            color: 0x000000,
+                            emissive: 0x0d0d0f,
+                            emissiveIntensity: 1,
+                            metalness: 0,
+                            roughness: 1,
+                            envMapIntensity: 0,
+                            toneMapped: false,
+                        },
+                        OLED_off: {
+                            color: 0x000000,
+                            emissive: 0x0d0d0f,
+                            emissiveIntensity: 1,
+                            metalness: 0,
+                            roughness: 1,
+                            envMapIntensity: 0,
+                            toneMapped: false,
+                        },
+                    },
+                },
+            ];
+            let currentModel = MODELS[0];
+            const EMBEDDED_MODELS = null; // standalone build replaces this with {id: base64, ...}
+
+            const wrap = document.getElementById("canvas-wrap");
+            const loaderEl = document.getElementById("loader");
+            const statusEl = document.getElementById("status");
+            let lastW = 0,
+                lastH = 0; // last applied canvas size (for resize dedupe + orientation re-fit)
+
+            const renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true,
+                preserveDrawingBuffer: true,
+            });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.35;
+            wrap.appendChild(renderer.domElement);
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xffffff);
+            const camera = new THREE.PerspectiveCamera(
+                32,
+                wrap.clientWidth / wrap.clientHeight,
+                0.25,
+                100,
+            );
+            camera.position.set(0, 0, 6);
+
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.08;
+            controls.enablePan = false;
+            controls.minDistance = 2.2;
+            controls.maxDistance = 14;
+
+            // Environment for realistic titanium/glass reflections
+            const pmrem = new THREE.PMREMGenerator(renderer);
+            const envRT = pmrem.fromScene(new RoomEnvironment(), 0.04);
+            scene.environment = envRT.texture;
+            scene.environmentIntensity = 2.4; // main driver of PBR brightness — was implicitly 1
+
+            // Surround rig: a light from every side so the body is never dark at any rotation.
+            const lightRig = new THREE.Group();
+            scene.add(lightRig);
+            const SIDE_DIRS = [
+                [0, 0, 1],
+                [0, 0, -1], // front / back
+                [1, 0, 0],
+                [-1, 0, 0], // right / left
+                [0, 1, 0],
+                [0, -1, 0], // top / bottom
+                [1, 1, 1],
+                [-1, 1, 1], // angled keys for metal sheen
+                [1, 1, -1],
+                [-1, 1, -1],
+            ];
+            const surroundLights = SIDE_DIRS.map(([x, y, z]) => {
+                const l = new THREE.DirectionalLight(0xffffff, 1.15);
+                l.position.set(x * 6, y * 6, z * 6);
+                lightRig.add(l);
+                return l;
+            });
+            // Soft sky/ground ambient so shadowed sides keep some color
+            const hemi = new THREE.HemisphereLight(0xffffff, 0xdfe4ff, 0.9);
+            scene.add(hemi);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+
+            // --- Model rig ---
+            const rig = new THREE.Group(); // everything rotates together
+            scene.add(rig);
+            let modelGroup = null;
+
+            // Each model's screen material (currentModel.screenMat) gets its emissiveMap swapped with the
+            // imported screenshot for pixel-perfect UV alignment.
+            const APPLE_LOGO_INLAY = "dwrMminMXjXXeek"; // 15 Pro: back Apple logo metal inlay (only used by the logo mesh)
+            const APPLE_LOGO_OVERLAY = "ZQfGMLaFcpPaLMU"; // 15 Pro: glass overlay shared by the logo AND the camera plateau
+            let screenMaterial = null;
+            let originalEmissiveMap = null; // the default titanium wallpaper, kept for "Clear screen"
+
+            const texLoader = new THREE.TextureLoader();
+            let screenTexture = null;
+
+            const gltfLoader = new GLTFLoader();
+
+            function clearModel() {
+                if (modelGroup) {
+                    rig.remove(modelGroup);
+                }
+                modelGroup = null;
+                screenMaterial = null;
+                originalEmissiveMap = null;
+            }
+
+            function fitModel(root) {
+                // Orient first (each glb has its own axes), then normalize: height = 3 world units, centered.
+                const r = currentModel.rot || [0, 0, 0];
+                root.rotation.set(r[0], r[1], r[2]);
+                root.position.set(0, 0, 0);
+                root.scale.setScalar(1);
+                root.updateMatrixWorld(true);
+
+                const box = new THREE.Box3().setFromObject(root);
+                const size = new THREE.Vector3();
+                box.getSize(size);
+                root.scale.setScalar(3.0 / size.y);
+                root.updateMatrixWorld(true);
+
+                const center = new THREE.Box3()
+                    .setFromObject(root)
+                    .getCenter(new THREE.Vector3());
+                root.position.sub(center);
+            }
+
+            const bodyMats = []; // dark body materials we brighten; {mat, base:Color}
+            const logoMeshes = []; // Apple-logo mesh(es), lifted off the shell to stop z-fighting
+
+            function findScreenMaterial(root) {
+                screenMaterial = null;
+                bodyMats.length = 0;
+                logoMeshes.length = 0;
+                // Materials are SHARED across meshes. Treat each once: re-running a branch on an already
+                // mutated material misclassifies it (e.g. a flat-blacked pill got roughness=1, so on its 2nd
+                // mesh it fell through to bodyMats and was brightened back to gray).
+                const processedMats = new Set();
+                root.traverse((o) => {
+                    if (!o.isMesh) return;
+                    const mats = Array.isArray(o.material)
+                        ? o.material
+                        : [o.material];
+                    for (const m of mats) {
+                        if (!m) continue;
+                        // Per-MESH action, before the material dedupe: hide the logo's small glass overlay
+                        // (z-fights the metal inlay); its shared material still gets processed via the plateau mesh.
+                        if (m.name === APPLE_LOGO_OVERLAY) {
+                            o.geometry.computeBoundingBox();
+                            const bb = o.geometry.boundingBox.getSize(
+                                new THREE.Vector3(),
+                            );
+                            if (Math.max(bb.x, bb.y, bb.z) < 3) {
+                                o.visible = false;
+                                continue;
+                            }
+                        }
+                        if (processedMats.has(m)) continue;
+                        processedMats.add(m);
+                        // Per-model material overrides (e.g. de-reflect a cover glass); hex values for color props.
+                        // Tweaked materials are final: skip all later passes (esp. body brightening, which would
+                        // lift a flat-blacked bezel right back to reflective gray).
+                        const tweak =
+                            currentModel.tweaks && currentModel.tweaks[m.name];
+                        if (tweak) {
+                            for (const [k, v] of Object.entries(tweak)) {
+                                if ((k === "color" || k === "emissive") && m[k])
+                                    m[k] = new THREE.Color(v);
+                                else m[k] = v;
+                            }
+                            m.needsUpdate = true;
+                            continue;
+                        }
+                        if (m.name === currentModel.screenMat) {
+                            screenMaterial = m;
+                            // Some models bake the wallpaper into the base map instead of an emissive map — promote it
+                            originalEmissiveMap =
+                                m.emissiveMap || m.map || null;
+                            // Make the screen glow at full brightness regardless of scene lighting
+                            m.emissive = new THREE.Color(0xffffff);
+                            m.emissiveIntensity = 1;
+                            m.toneMapped = false;
+                            // Kill environment/specular reflections so no light hotspot washes over the screenshot
+                            m.metalness = 0;
+                            m.roughness = 1;
+                            m.envMapIntensity = 0;
+                            if ("clearcoat" in m) m.clearcoat = 0;
+                            m.color = new THREE.Color(0x000000); // base black so only the emissive screenshot shows
+                            m.map = null; // diffuse map is dead weight once the screen is emissive-only
+                            m.emissiveMap = originalEmissiveMap;
+                            m.needsUpdate = true;
+                        } else if (m.color) {
+                            // Mirror-glossy PLAIN front parts (front glass, Dynamic Island glass) reflect the
+                            // environment as bright hotspots. Lock them to flat deep black. IMPORTANT: skip any
+                            // material carrying a VISIBLE texture (Apple logo, camera rings) — those keep their look.
+                            // Metalness/roughness-only maps don't define a look: counting them exempted the Dynamic
+                            // Island pill + screen bezel ring from the blackout, leaving them light-reflective gray.
+                            const hasTexture =
+                                m.map || m.emissiveMap || m.normalMap;
+                            if (m.name === APPLE_LOGO_INLAY) {
+                                // THE Apple logo. Render it FLAT: pure emissive dark, unlit (toneMapped off, no
+                                // diffuse/spec/env) so nothing can band or streak — a plain opaque logo.
+                                m.color = new THREE.Color(0x000000);
+                                m.emissive = new THREE.Color(0x1c1c20); // flat dark logo tint
+                                m.emissiveIntensity = 1;
+                                m.metalness = 0;
+                                m.roughness = 1;
+                                m.envMapIntensity = 0;
+                                m.toneMapped = false;
+                                m.flatShading = false;
+                                m.transparent = false;
+                                m.opacity = 1;
+                                if ("clearcoat" in m) {
+                                    m.clearcoat = 0;
+                                    m.clearcoatRoughness = 1;
+                                }
+                                if ("specularIntensity" in m)
+                                    m.specularIntensity = 0;
+                                m.needsUpdate = true;
+                                logoMeshes.push(o);
+                                continue;
+                            }
+                            // The blackout + reflection-taming passes are tuned for the 15 Pro glb — on other models
+                            // they would turn legitimate glass (screen cover, camera sapphire) into opaque black plates.
+                            if (
+                                currentModel.fixes15 &&
+                                m.roughness !== undefined &&
+                                m.roughness <= 0.1 &&
+                                m.metalness !== undefined &&
+                                !hasTexture
+                            ) {
+                                m.metalness = 0;
+                                m.roughness = 1;
+                                m.metalnessMap = null;
+                                m.roughnessMap = null; // maps would re-add specular sheen from the light rig
+                                m.envMapIntensity = 0; // no environment reflection
+                                m.color = new THREE.Color(0x000000); // no diffuse contribution from lights
+                                m.emissive = new THREE.Color(0x0d0d0f); // flat deep black, matches the bezel
+                                m.emissiveIntensity = 1;
+                                m.toneMapped = false; // keep it exactly this dark regardless of exposure
+                                if ("clearcoat" in m) {
+                                    m.clearcoat = 0;
+                                    m.clearcoatRoughness = 1;
+                                }
+                                if ("specularIntensity" in m)
+                                    m.specularIntensity = 0;
+                                if ("reflectivity" in m) m.reflectivity = 0;
+                                if ("transmission" in m) m.transmission = 0;
+                                m.transparent = false;
+                                m.opacity = 1;
+                                m.needsUpdate = true;
+                                continue; // don't also treat it as a body material to brighten
+                            }
+                            // Other textured glossy parts: keep texture, tame harsh reflection.
+                            if (
+                                currentModel.fixes15 &&
+                                m.roughness !== undefined &&
+                                m.roughness <= 0.1 &&
+                                hasTexture
+                            ) {
+                                m.roughness = Math.max(m.roughness, 0.4);
+                                m.envMapIntensity = 0.2;
+                                m.needsUpdate = true;
+                            }
+                            // Remember original base color of every non-screen material so we can lift the dark ones
+                            bodyMats.push({ mat: m, base: m.color.clone() });
+                        }
+                    }
+                });
+                // The logo shares the exact depth of the back shell + another panel → 3-way z-fighting.
+                // polygonOffset alone weakens when zoomed out, so ALSO physically lift the mesh off the shell
+                // along its own surface normal (a real geometric gap that never z-fights at any distance).
+                const rigBox = new THREE.Box3().setFromObject(rig);
+                const rigCenter = rigBox.getCenter(new THREE.Vector3());
+                for (const mesh of logoMeshes) {
+                    mesh.renderOrder = 3;
+                    const mm = Array.isArray(mesh.material)
+                        ? mesh.material[0]
+                        : mesh.material;
+                    if (mm) {
+                        mm.polygonOffset = true;
+                        mm.polygonOffsetFactor = -12;
+                        mm.polygonOffsetUnits = -12;
+                        mm.needsUpdate = true;
+                    }
+                    // Lift along the flat mesh's face normal. NOT origin-to-center: the node origin sits at the
+                    // phone origin, so that direction is numerical noise and can push the logo INTO the shell.
+                    mesh.updateWorldMatrix(true, false);
+                    const nAttr = mesh.geometry.attributes.normal;
+                    const outward = new THREE.Vector3(
+                        nAttr.getX(0),
+                        nAttr.getY(0),
+                        nAttr.getZ(0),
+                    )
+                        .applyNormalMatrix(
+                            new THREE.Matrix3().getNormalMatrix(
+                                mesh.matrixWorld,
+                            ),
+                        )
+                        .normalize();
+                    // Sign-check against phone-center → logo-surface so we always lift OUT of the shell
+                    mesh.geometry.computeBoundingBox();
+                    const surf = mesh.localToWorld(
+                        mesh.geometry.boundingBox.getCenter(
+                            new THREE.Vector3(),
+                        ),
+                    );
+                    if (outward.dot(surf.sub(rigCenter)) < 0) outward.negate();
+                    const worldPos = mesh.getWorldPosition(new THREE.Vector3());
+                    const targetWorld = worldPos.addScaledVector(
+                        outward,
+                        0.016,
+                    ); // small lift: clears z-fight, stays flush
+                    mesh.position.copy(mesh.parent.worldToLocal(targetWorld));
+                }
+                applyBodyBrightness(bodyBrightness);
+                return screenMaterial;
+            }
+
+            // 1 = original. >1 lifts dark body colors toward a lighter, ad-friendly finish.
+            let bodyBrightness = 1.6;
+            function applyBodyBrightness(k) {
+                bodyBrightness = k;
+                for (const { mat, base } of bodyMats) {
+                    const lum =
+                        0.2126 * base.r + 0.7152 * base.g + 0.0722 * base.b;
+                    // Only lift genuinely dark materials (the body/frame); leave light or colored ones alone
+                    const t = lum < 0.5 ? 1 - lum / 0.5 : 0; // 0..1, strongest on near-black
+                    const f = 1 + (k - 1) * t;
+                    mat.color.setRGB(
+                        Math.min(1, base.r * f + 0.04 * (k - 1) * t),
+                        Math.min(1, base.g * f + 0.04 * (k - 1) * t),
+                        Math.min(1, base.b * f + 0.05 * (k - 1) * t),
+                    );
+                    mat.needsUpdate = true;
+                }
+            }
+
+            function setScreenTexture(tex) {
+                if (screenTexture && screenTexture !== originalEmissiveMap)
+                    screenTexture.dispose();
+                screenTexture = tex;
+                if (!screenMaterial) return;
+                if (tex) {
+                    tex.colorSpace = THREE.SRGBColorSpace;
+                    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+                    // Inherit the exact UV transform of the original wallpaper so alignment + orientation match
+                    const o = originalEmissiveMap;
+                    if (o) {
+                        tex.flipY = o.flipY;
+                        tex.wrapS = o.wrapS;
+                        tex.wrapT = o.wrapT;
+                        tex.center.copy(o.center);
+                        tex.offset.copy(o.offset);
+                        tex.repeat.copy(o.repeat);
+                        tex.rotation = o.rotation;
+                    } else {
+                        tex.flipY = false;
+                        tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+                    }
+                    // Correct this model's screen UV orientation (each glb maps its screen differently)
+                    const uv = currentModel.uv || {};
+                    tex.center.set(0.5, 0.5);
+                    if (uv.rot) tex.rotation += uv.rot;
+                    if (uv.mirrorX) tex.repeat.x = -Math.abs(tex.repeat.x || 1);
+                    if (uv.flipY !== undefined) tex.flipY = uv.flipY;
+                    // Exact affine remap for meshes whose front face doesn't span UV 0..1 (17 Pro Max):
+                    // maps the measured UV window onto the full canvas (negative scale = builtin 180°).
+                    // center must be (0,0): setUvTransform folds a non-zero center into the affine even at rot 0.
+                    if (uv.repeat) {
+                        tex.center.set(0, 0);
+                        tex.rotation = 0;
+                        tex.repeat.set(uv.repeat[0], uv.repeat[1]);
+                    }
+                    if (uv.offset) tex.offset.set(uv.offset[0], uv.offset[1]);
+                    // Meshes with UVs outside 0..1 (17 Pro Max) must clamp so overshoot samples the bezel border,
+                    // not a wrapped copy of the screenshot interior
+                    if (uv.clamp) {
+                        tex.wrapS = THREE.ClampToEdgeWrapping;
+                        tex.wrapT = THREE.ClampToEdgeWrapping;
+                    }
+                    tex.needsUpdate = true;
+                    screenMaterial.emissiveMap = tex;
+                } else {
+                    // Restore the model's original wallpaper
+                    screenMaterial.emissiveMap = originalEmissiveMap;
+                }
+                screenMaterial.needsUpdate = true;
+            }
+
+            function loadModelCfg(cfg) {
+                currentModel = cfg;
+                document.querySelector("#panel h1").firstChild.textContent =
+                    cfg.label + " ";
+                loaderEl.style.display = "block";
+                const onLoaded = (gltf) => {
+                    clearModel();
+                    modelGroup = gltf.scene;
+                    fitModel(modelGroup);
+                    rig.add(modelGroup);
+                    const found = findScreenMaterial(modelGroup);
+                    // Recompose from the raw image: per-model framing (bezel inset) differs between models
+                    if (lastShotImg)
+                        setScreenTexture(
+                            new THREE.CanvasTexture(
+                                composeScreenCanvas(lastShotImg),
+                            ),
+                        );
+                    else if (screenTexture) setScreenTexture(screenTexture);
+                    loaderEl.style.display = "none";
+                    statusEl.textContent = found
+                        ? "Model loaded · " + cfg.label
+                        : "Loaded, but screen material not found — use a different .glb.";
+                    applyPreset(presets[0]);
+                };
+                const onError = (err) => {
+                    loaderEl.innerHTML =
+                        "Couldn't load model.<br><small style='color:#9a9aa8'>Open this HTML next to the .glb, or drop a file in.</small>";
+                    console.error(err);
+                };
+                if (EMBEDDED_MODELS && EMBEDDED_MODELS[cfg.id]) {
+                    const bin = Uint8Array.from(
+                        atob(EMBEDDED_MODELS[cfg.id]),
+                        (c) => c.charCodeAt(0),
+                    );
+                    gltfLoader.parse(bin.buffer, "", onLoaded, onError);
+                } else {
+                    gltfLoader.load(cfg.url, onLoaded, undefined, onError);
+                }
+            }
+
+            function loadModelFromFile(file) {
+                const url = URL.createObjectURL(file);
+                gltfLoader.load(
+                    url,
+                    (gltf) => {
+                        clearModel();
+                        modelGroup = gltf.scene;
+                        fitModel(modelGroup);
+                        rig.add(modelGroup);
+                        findScreenMaterial(modelGroup);
+                        if (screenTexture) setScreenTexture(screenTexture);
+                        loaderEl.style.display = "none";
+                        statusEl.textContent = "Model loaded · " + file.name;
+                        URL.revokeObjectURL(url);
+                    },
+                    undefined,
+                    (err) => {
+                        console.error(err);
+                        statusEl.textContent = "Load failed.";
+                    },
+                );
+            }
+
+            // --- Ad-style presets ---
+            // az/el = camera orbit (deg); dist = zoom; ry/rz = model tilt & roll (rad, ad-style lean)
+            const presets = [
+                { name: "Hero", az: 20, el: 6, dist: 6.0, ry: 0.0, rz: 0.0 },
+                { name: "Straight", az: 0, el: 0, dist: 5.4, ry: 0.0, rz: 0.0 },
+                {
+                    name: "Floating",
+                    az: 24,
+                    el: 12,
+                    dist: 6.4,
+                    ry: 0.3,
+                    rz: -0.12,
+                },
+                {
+                    name: "Tilt left",
+                    az: 34,
+                    el: 6,
+                    dist: 6.1,
+                    ry: 0.45,
+                    rz: 0.14,
+                },
+                {
+                    name: "Tilt right",
+                    az: -34,
+                    el: 6,
+                    dist: 6.1,
+                    ry: -0.45,
+                    rz: -0.14,
+                },
+                { name: "Back", az: 180, el: 6, dist: 6.2, ry: 0.0, rz: 0.0 },
+                {
+                    name: "Low angle",
+                    az: 16,
+                    el: -24,
+                    dist: 6.2,
+                    ry: 0.15,
+                    rz: 0.06,
+                },
+                {
+                    name: "Top down",
+                    az: 0,
+                    el: 46,
+                    dist: 6.6,
+                    ry: 0.0,
+                    rz: 0.0,
+                },
+            ];
+
+            let anim = null;
+            function applyPreset(p) {
+                autoSpin = false;
+                // Drive OrbitControls via its spherical target so damping stays consistent
+                const azr = THREE.MathUtils.degToRad(p.az);
+                const polar = THREE.MathUtils.degToRad(90 - p.el); // el 0 => equator
+                const start = {
+                    az: controls.getAzimuthalAngle(),
+                    pol: controls.getPolarAngle(),
+                    dist: camera.position.distanceTo(controls.target),
+                    ry: rig.rotation.y,
+                    rz: rig.rotation.z,
+                };
+                const t0 = performance.now(),
+                    dur = 700;
+                cancelAnimationFrame(anim);
+                function tween(now) {
+                    const k = Math.min(1, (now - t0) / dur);
+                    const e = 1 - Math.pow(1 - k, 3); // easeOutCubic
+                    const az = start.az + (azr - start.az) * e;
+                    const pol = start.pol + (polar - start.pol) * e;
+                    const dist = start.dist + (p.dist - start.dist) * e;
+                    const sinP = Math.sin(pol);
+                    camera.position.set(
+                        controls.target.x + dist * sinP * Math.sin(az),
+                        controls.target.y + dist * Math.cos(pol),
+                        controls.target.z + dist * sinP * Math.cos(az),
+                    );
+                    camera.lookAt(controls.target);
+                    rig.rotation.y = start.ry + (p.ry - start.ry) * e;
+                    rig.rotation.z = start.rz + (p.rz - start.rz) * e;
+                    controls.update();
+                    if (k < 1) anim = requestAnimationFrame(tween);
+                }
+                anim = requestAnimationFrame(tween);
+            }
+
+            // Build preset buttons
+            const presetWrap = document.getElementById("presets");
+            presets.forEach((p) => {
+                const b = document.createElement("button");
+                b.textContent = p.name;
+                b.onclick = () => applyPreset(p);
+                presetWrap.appendChild(b);
+            });
+
+            // --- UI wiring ---
+            let autoSpin = false;
+            document.getElementById("btn-spin").onclick = () => {
+                autoSpin = !autoSpin;
+            };
+
+            const fileShot = document.getElementById("file-shot");
+            let lastShotImg = null; // raw imported image, kept so model switches can recompose per-model framing
+            // Draw the imported screenshot onto a canvas. Models whose glb lacks a bezel (screenInset) get a
+            // black border with rounded inner corners composited around the screenshot.
+            function composeScreenCanvas(img) {
+                const W = 1179,
+                    H = 2556; // iPhone screen resolution (portrait)
+                const c = document.createElement("canvas");
+                c.width = W;
+                c.height = H;
+                const g = c.getContext("2d");
+                const inset = currentModel.screenInset;
+                const b = inset ? inset.border : 0;
+                if (b) {
+                    g.fillStyle = "#000000";
+                    g.fillRect(0, 0, W, H);
+                    g.save();
+                    g.beginPath();
+                    g.roundRect(b, b, W - 2 * b, H - 2 * b, inset.radius || 0);
+                    g.clip();
+                }
+                // Cover-fit the screenshot into the (possibly inset) display area
+                const iw = W - 2 * b,
+                    ih = H - 2 * b;
+                const s = Math.max(iw / img.width, ih / img.height);
+                const dw = img.width * s,
+                    dh = img.height * s;
+                g.drawImage(img, b + (iw - dw) / 2, b + (ih - dh) / 2, dw, dh);
+                if (b) g.restore();
+                return c;
+            }
+            document.getElementById("btn-import").onclick = () =>
+                fileShot.click();
+            fileShot.onchange = (e) => {
+                const f = e.target.files[0];
+                if (!f) return;
+                const url = URL.createObjectURL(f);
+                const img = new Image();
+                img.onload = () => {
+                    lastShotImg = img;
+                    const canvas = composeScreenCanvas(img);
+                    const tex = new THREE.CanvasTexture(canvas);
+                    setScreenTexture(tex);
+                    URL.revokeObjectURL(url);
+                    statusEl.textContent = "Screenshot: " + f.name;
+                };
+                img.onerror = () => {
+                    statusEl.textContent = "Couldn't load image.";
+                    URL.revokeObjectURL(url);
+                };
+                img.src = url;
+            };
+            document.getElementById("btn-clear-shot").onclick = () => {
+                lastShotImg = null;
+                setScreenTexture(null);
+            };
+
+            const fileModel = document.getElementById("file-model");
+            document.getElementById("btn-model").onclick = () =>
+                fileModel.click();
+            fileModel.onchange = (e) => {
+                const f = e.target.files[0];
+                if (f) loadModelFromFile(f);
+            };
+
+            // Export the current view as a transparent PNG, auto-cropped to the phone with padding
+            const EXPORT_PADDING = 0.02; // fraction of the phone's size added as margin on each side
+            // On touch devices with the Web Share API (iOS Safari), label the button "Save image".
+            if (
+                matchMedia("(pointer: coarse)").matches &&
+                navigator.canShare &&
+                navigator.canShare({
+                    files: [
+                        new File([new Blob()], "x.png", { type: "image/png" }),
+                    ],
+                })
+            ) {
+                document.getElementById("btn-download").textContent =
+                    "Save image";
+            }
+            document.getElementById("btn-download").onclick = () => {
+                // Render into a FIXED tall frame with the camera framed to fit the whole phone, independent of
+                // the live window size/aspect (so a narrow phone viewport can't clip it). Then crop to the phone.
+                const liveW = wrap.clientWidth,
+                    liveH = wrap.clientHeight;
+                const W = 1400,
+                    H = 2000; // fixed portrait export frame
+                const prevBg = scene.background;
+                const prevAspect = camera.aspect;
+                const prevZoom = camera.zoom;
+                const wasSpin = autoSpin;
+                autoSpin = false;
+                scene.background = null; // transparent
+
+                // Re-aim the camera at the model's true center along the current view direction, so the phone is
+                // centered in the export frame (the live controls.target may not sit on the model center).
+                const box = new THREE.Box3().setFromObject(rig);
+                const modelCenter = box.getCenter(new THREE.Vector3());
+                const prevCamPos = camera.position.clone();
+                const viewDir = new THREE.Vector3();
+                camera.getWorldDirection(viewDir);
+                const dist = prevCamPos.distanceTo(controls.target);
+                camera.position
+                    .copy(modelCenter)
+                    .addScaledVector(viewDir, -dist); // same distance, aimed at center
+                camera.up.set(0, 1, 0);
+                camera.lookAt(modelCenter);
+                camera.aspect = W / H;
+                camera.zoom = 1;
+                camera.updateProjectionMatrix();
+                camera.updateMatrixWorld(true);
+
+                // Measure the model's projected extent (now centered) and zoom so it fills ~82% of the frame.
+                const corners = [
+                    new THREE.Vector3(box.min.x, box.min.y, box.min.z),
+                    new THREE.Vector3(box.min.x, box.min.y, box.max.z),
+                    new THREE.Vector3(box.min.x, box.max.y, box.min.z),
+                    new THREE.Vector3(box.min.x, box.max.y, box.max.z),
+                    new THREE.Vector3(box.max.x, box.min.y, box.min.z),
+                    new THREE.Vector3(box.max.x, box.min.y, box.max.z),
+                    new THREE.Vector3(box.max.x, box.max.y, box.min.z),
+                    new THREE.Vector3(box.max.x, box.max.y, box.max.z),
+                ];
+                let maxNx = 0,
+                    maxNy = 0;
+                for (const c of corners) {
+                    const p = c.clone().project(camera); // NDC in [-1,1]
+                    maxNx = Math.max(maxNx, Math.abs(p.x));
+                    maxNy = Math.max(maxNy, Math.abs(p.y));
+                }
+                camera.zoom = 0.82 / Math.max(maxNx, maxNy);
+                camera.updateProjectionMatrix();
+
+                // Force pixelRatio 1 for export so the drawing buffer is exactly W×H (otherwise the retina
+                // pixelRatio doubles the buffer and we'd read only a corner of it).
+                const prevPR = renderer.getPixelRatio();
+                renderer.setPixelRatio(1);
+                renderer.setSize(W, H, false);
+                renderer.setClearColor(0x000000, 0);
+                renderer.render(scene, camera);
+
+                // Read the rendered pixels straight from the GL buffer (origin is bottom-left)
+                const gl = renderer.getContext();
+                const pixels = new Uint8Array(W * H * 4);
+                gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+                scene.background = prevBg; // restore live view
+                renderer.setPixelRatio(prevPR);
+                camera.position.copy(prevCamPos);
+                camera.lookAt(controls.target);
+                camera.aspect = prevAspect;
+                camera.zoom = prevZoom;
+                camera.updateProjectionMatrix();
+                controls.update();
+                renderer.setSize(liveW, liveH, false);
+                lastW = lastH = 0; // force onResize to re-sync canvas CSS next tick
+                autoSpin = wasSpin;
+
+                // Alpha bounding box (flip Y because GL rows run bottom-to-top)
+                let minX = W,
+                    minY = H,
+                    maxX = -1,
+                    maxY = -1;
+                for (let y = 0; y < H; y++) {
+                    const row = (H - 1 - y) * W;
+                    for (let x = 0; x < W; x++) {
+                        if (pixels[(row + x) * 4 + 3] > 8) {
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                        }
+                    }
+                }
+                if (maxX < minX) {
+                    statusEl.textContent = "Nothing to export.";
+                    return;
+                }
+
+                const bw = maxX - minX + 1,
+                    bh = maxY - minY + 1;
+                const pad = Math.round(Math.max(bw, bh) * EXPORT_PADDING);
+
+                // Draw the full rendered frame into a 2D canvas (flip Y from GL bottom-up)
+                const full = document.createElement("canvas");
+                full.width = W;
+                full.height = H;
+                const fctx = full.getContext("2d");
+                const imgData = fctx.createImageData(W, H);
+                for (let y = 0; y < H; y++) {
+                    const src = (H - 1 - y) * W * 4,
+                        dst = y * W * 4;
+                    imgData.data.set(pixels.subarray(src, src + W * 4), dst);
+                }
+                fctx.putImageData(imgData, 0, 0);
+
+                // Output = tight phone bbox + uniform padding on ALL sides (added as transparent space,
+                // so padding is always even even if the phone touched a frame edge in the render).
+                const cw = bw + pad * 2,
+                    ch = bh + pad * 2;
+                const out = document.createElement("canvas");
+                out.width = cw;
+                out.height = ch;
+                out.getContext("2d").drawImage(
+                    full,
+                    minX,
+                    minY,
+                    bw,
+                    bh,
+                    pad,
+                    pad,
+                    bw,
+                    bh,
+                );
+
+                // Build the PNG blob SYNCHRONOUSLY (toDataURL, not async toBlob) so navigator.share is still
+                // inside the user-gesture on iOS Safari — otherwise iOS drops the gesture and ignores share().
+                const dataURL = out.toDataURL("image/png");
+                const bstr = atob(dataURL.split(",")[1]);
+                const bytes = new Uint8Array(bstr.length);
+                for (let i = 0; i < bstr.length; i++)
+                    bytes[i] = bstr.charCodeAt(i);
+                const blob = new Blob([bytes], { type: "image/png" });
+
+                const doDownload = () => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "iphone-15-pro-mockup.png";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    setTimeout(() => URL.revokeObjectURL(url), 4000);
+                    statusEl.textContent =
+                        "Downloaded " +
+                        cw +
+                        "×" +
+                        ch +
+                        " (" +
+                        Math.round(blob.size / 1024) +
+                        " KB)";
+                };
+
+                const isTouch = matchMedia("(pointer: coarse)").matches;
+                const file = new File([blob], "iPhone mockup.png", {
+                    type: "image/png",
+                });
+                // On touch (iOS/mobile): open the native share sheet (→ "Save Image" to Photos).
+                if (isTouch && navigator.share) {
+                    navigator
+                        .share({ files: [file] })
+                        .then(() => {
+                            statusEl.textContent = "Saved · " + cw + "×" + ch;
+                        })
+                        .catch((err) => {
+                            if (err && err.name === "AbortError") {
+                                statusEl.textContent =
+                                    "Ready · " + cw + "×" + ch;
+                            } else {
+                                doDownload();
+                            }
+                        });
+                } else {
+                    doDownload();
+                }
+            };
+
+            document.getElementById("env").oninput = (e) => {
+                const v = e.target.value; // 100% = baseline
+                const k = v / 100;
+                scene.environmentIntensity = 2.4 * k; // reflections / metal sheen
+                renderer.toneMappingExposure = 1.35 * (0.7 + 0.3 * k);
+                surroundLights.forEach((l) => {
+                    l.intensity = 1.15 * k;
+                }); // scale every-side lights
+                hemi.intensity = 0.9 * k;
+                applyBodyBrightness(1 + (1.6 - 1) * k); // lift the dark body base color in step
+                document.getElementById("v-env").textContent = v + "%";
+            };
+
+            // Drag & drop model
+            const stage = document.getElementById("stage");
+            const dropNote = document.getElementById("drop-note");
+            ["dragenter", "dragover"].forEach((ev) =>
+                stage.addEventListener(ev, (e) => {
+                    e.preventDefault();
+                    dropNote.style.display = "flex";
+                }),
+            );
+            ["dragleave", "drop"].forEach((ev) =>
+                stage.addEventListener(ev, (e) => {
+                    e.preventDefault();
+                    if (ev === "drop") {
+                        const f = e.dataTransfer.files[0];
+                        if (f) loadModelFromFile(f);
+                    }
+                    dropNote.style.display = "none";
+                }),
+            );
+
+            // Resize
+            function onResize() {
+                // Read the canvas container's real size after layout has settled
+                const w = wrap.clientWidth,
+                    h = wrap.clientHeight;
+                if (w === 0 || h === 0) return; // mid-reflow — skip
+                if (w === lastW && h === lastH) return; // no change
+                lastW = w;
+                lastH = h;
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                renderer.setSize(w, h); // update BOTH the drawing buffer and the canvas CSS size
+            }
+            // Re-fit on the next animation frame so we read post-layout sizes, not mid-rotation ones
+            function scheduleResize() {
+                requestAnimationFrame(() => requestAnimationFrame(onResize));
+            }
+            window.addEventListener("resize", scheduleResize);
+            window.addEventListener("orientationchange", () => {
+                scheduleResize();
+                setTimeout(scheduleResize, 250);
+                setTimeout(scheduleResize, 600);
+            });
+            // visualViewport fires when iOS Safari's viewport truly settles after a rotation — most reliable signal
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener(
+                    "resize",
+                    scheduleResize,
+                );
+            }
+            // Safety net: if the container size ever drifts from the renderer, correct it in the render loop
+            setInterval(onResize, 500);
+
+            // --- Mobile bottom-sheet drag ---
+            (function initSheet() {
+                const panel = document.getElementById("panel");
+                const handle = document.getElementById("sheet-handle");
+                if (!handle) return;
+
+                // Bottom-sheet behavior only applies in portrait; landscape uses a static side panel
+                const isMobile = () =>
+                    matchMedia("(orientation: portrait)").matches &&
+                    matchMedia("(max-width: 760px), (pointer: coarse)").matches;
+                let dragging = false,
+                    startY = 0,
+                    startT = 0,
+                    lastY = 0,
+                    lastT = 0,
+                    collapsedT = 0;
+
+                const peekPx = () =>
+                    parseInt(
+                        getComputedStyle(panel).getPropertyValue("--peek"),
+                    ) || 128;
+                const collapsedTranslate = () =>
+                    panel.getBoundingClientRect().height - peekPx(); // matches CSS --peek
+                const currentTranslate = () => {
+                    const m = new DOMMatrixReadOnly(
+                        getComputedStyle(panel).transform,
+                    );
+                    return m.m42 || 0;
+                };
+                const setExpanded = (on) => {
+                    panel.classList.toggle("expanded", on);
+                    panel.style.transform = ""; // let CSS class drive it
+                };
+
+                // On orientation/size change, clear sheet state so each layout (portrait sheet vs landscape panel) is clean
+                const resetSheet = () => {
+                    panel.classList.remove("expanded", "dragging");
+                    panel.style.transform = "";
+                };
+                window.addEventListener("orientationchange", resetSheet);
+                matchMedia("(orientation: portrait)").addEventListener?.(
+                    "change",
+                    resetSheet,
+                );
+
+                const expanded = () => panel.classList.contains("expanded");
+                let active = false,
+                    moved = false,
+                    onHandle = false,
+                    suppressClick = false;
+
+                const onDown = (e) => {
+                    if (!isMobile()) return;
+                    onHandle = !!(
+                        e.target.closest && e.target.closest("#sheet-handle")
+                    );
+                    // When collapsed, a touch ANYWHERE on the panel can drag it open.
+                    // When expanded, only the handle drags (the body scrolls / buttons work).
+                    if (!expanded() || onHandle) {
+                        active = true;
+                        moved = false;
+                        collapsedT = collapsedTranslate();
+                        startT = currentTranslate();
+                        startY = e.touches ? e.touches[0].clientY : e.clientY;
+                    }
+                };
+                const onMove = (e) => {
+                    if (!active) return;
+                    const y = e.touches ? e.touches[0].clientY : e.clientY;
+                    const dy = y - startY;
+                    if (!moved && Math.abs(dy) > 4) {
+                        moved = true;
+                        panel.classList.add("dragging");
+                    }
+                    if (!moved) return;
+                    let t = Math.max(0, Math.min(collapsedT, startT + dy));
+                    panel.style.transform = "translateY(" + t + "px)";
+                    e.preventDefault(); // we're dragging the sheet; block scroll/click
+                };
+                const armSuppress = () => {
+                    suppressClick = true;
+                    setTimeout(() => {
+                        suppressClick = false;
+                    }, 400); // auto-clear so it never lingers
+                };
+                const onUp = () => {
+                    if (!active) return;
+                    active = false;
+                    if (!moved) {
+                        // Tap without drag: if collapsed, open it (swallow the button click that would follow)
+                        if (!expanded()) {
+                            setExpanded(true);
+                            armSuppress();
+                        }
+                        return;
+                    }
+                    panel.classList.remove("dragging");
+                    const t = currentTranslate();
+                    setExpanded(t < collapsedT * 0.5);
+                    armSuppress(); // a drag just ended — don't let it click a button
+                };
+
+                panel.addEventListener("touchstart", onDown, { passive: true });
+                window.addEventListener("touchmove", onMove, {
+                    passive: false,
+                });
+                window.addEventListener("touchend", onUp);
+                panel.addEventListener("mousedown", onDown);
+                window.addEventListener("mousemove", onMove);
+                window.addEventListener("mouseup", onUp);
+
+                // Swallow the click that immediately follows an open-drag / open-tap
+                panel.addEventListener(
+                    "click",
+                    (e) => {
+                        if (suppressClick) {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            suppressClick = false;
+                        }
+                    },
+                    true,
+                );
+
+                // Auto-collapse after picking an action so the phone stays visible
+                panel
+                    .querySelectorAll(
+                        "#presets button, #btn-spin, #btn-download",
+                    )
+                    .forEach((b) => {
+                        b.addEventListener("click", () => {
+                            if (isMobile()) setExpanded(false);
+                        });
+                    });
+
+                // Tap the phone area (above the sheet) to close the menu — but not while rotating the model
+                const stageEl = document.getElementById("stage");
+                let sTapX = 0,
+                    sTapY = 0,
+                    sTapT = 0;
+                const sStart = (e) => {
+                    const p = e.touches ? e.touches[0] : e;
+                    sTapX = p.clientX;
+                    sTapY = p.clientY;
+                    sTapT = Date.now();
+                };
+                const sEnd = (e) => {
+                    if (!isMobile() || !expanded()) return;
+                    const p = e.changedTouches ? e.changedTouches[0] : e;
+                    const moved =
+                        Math.abs(p.clientX - sTapX) +
+                        Math.abs(p.clientY - sTapY);
+                    if (moved < 12 && Date.now() - sTapT < 300)
+                        setExpanded(false); // a clean tap, not a rotate
+                };
+                stageEl.addEventListener("touchstart", sStart, {
+                    passive: true,
+                });
+                stageEl.addEventListener("touchend", sEnd, { passive: true });
+                stageEl.addEventListener("mousedown", sStart);
+                stageEl.addEventListener("mouseup", sEnd);
+            })();
+
+            // Render loop
+            function tick() {
+                requestAnimationFrame(tick);
+                if (autoSpin) rig.rotation.y += 0.006;
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            tick();
+
+            // Model picker
+            const modelSelect = document.getElementById("model-select");
+            MODELS.forEach((m, i) => {
+                const opt = document.createElement("option");
+                opt.value = i;
+                opt.textContent = m.label;
+                modelSelect.appendChild(opt);
+            });
+            modelSelect.onchange = () =>
+                loadModelCfg(MODELS[+modelSelect.value]);
+
+            // Boot
+            loadModelCfg(MODELS[0]);
+        </script>
+    </body>
+</html>

@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Bundled standalone build (49MB, GLBs embedded as base64) — not needed for GitHub Pages
+iPhone-Mockup.html
+
+# Extracted GLB texture dump — unused by the app (models are self-contained)
+textures/
+
+# Build scratch
+_build/
+node_modules/
