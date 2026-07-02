@@ -148,6 +148,24 @@
                     background: var(--accent-hover);
                 }
             }
+            #orientation-switch button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                padding: 9px 8px;
+            }
+            #orientation-switch button.active {
+                background: var(--accent);
+                border-color: var(--accent);
+                color: #fff;
+            }
+            #orientation-switch button.active:hover {
+                background: var(--accent-hover);
+            }
+            #orientation-switch svg {
+                flex-shrink: 0;
+            }
             .preset-grid {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
@@ -433,6 +451,46 @@
             <div class="divider"></div>
 
             <div class="group">
+                <div class="group-title" data-i18n="orientationTitle">Orientation</div>
+                <div class="row-2" id="orientation-switch">
+                    <button data-orient="portrait" class="active">
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="14"
+                            height="14"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <rect x="6" y="3" width="12" height="18" rx="2" />
+                            <path d="M11 18h2" />
+                        </svg>
+                        <span data-i18n="orientationPortrait">Portrait</span>
+                    </button>
+                    <button data-orient="landscape">
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="14"
+                            height="14"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <rect x="3" y="6" width="18" height="12" rx="2" />
+                            <path d="M18 11v2" />
+                        </svg>
+                        <span data-i18n="orientationLandscape">Landscape</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="group">
                 <div class="group-title" data-i18n="captureTitle">Screen capture</div>
                 <button class="primary" id="btn-import">
                     <i></i><span data-i18n="btnImport">Import screenshot…</span>
@@ -671,6 +729,9 @@
                     dropNote: "Drop a .glb model here",
                     langTitle: "Language",
                     modelTitle: "iPhone model",
+                    orientationTitle: "Orientation",
+                    orientationPortrait: "Portrait",
+                    orientationLandscape: "Landscape",
                     captureTitle: "Screen capture",
                     btnImport: "Import screenshot…",
                     captureHint:
@@ -717,6 +778,9 @@
                     dropNote: "Déposez un modèle .glb ici",
                     langTitle: "Langue",
                     modelTitle: "Modèle d'iPhone",
+                    orientationTitle: "Orientation",
+                    orientationPortrait: "Portrait",
+                    orientationLandscape: "Paysage",
                     captureTitle: "Capture d'écran",
                     btnImport: "Importer une capture d'écran…",
                     captureHint:
@@ -764,6 +828,9 @@
                     dropNote: "Suelta un modelo .glb aquí",
                     langTitle: "Idioma",
                     modelTitle: "Modelo de iPhone",
+                    orientationTitle: "Orientación",
+                    orientationPortrait: "Vertical",
+                    orientationLandscape: "Horizontal",
                     captureTitle: "Captura de pantalla",
                     btnImport: "Importar captura de pantalla…",
                     captureHint:
@@ -811,6 +878,9 @@
                     dropNote: "Ziehe eine .glb-Datei hierher",
                     langTitle: "Sprache",
                     modelTitle: "iPhone-Modell",
+                    orientationTitle: "Ausrichtung",
+                    orientationPortrait: "Hochformat",
+                    orientationLandscape: "Querformat",
                     captureTitle: "Screenshot",
                     btnImport: "Screenshot importieren…",
                     captureHint:
@@ -858,6 +928,9 @@
                     dropNote: "Trascina qui un modello .glb",
                     langTitle: "Lingua",
                     modelTitle: "Modello iPhone",
+                    orientationTitle: "Orientamento",
+                    orientationPortrait: "Verticale",
+                    orientationLandscape: "Orizzontale",
                     captureTitle: "Screenshot",
                     btnImport: "Importa screenshot…",
                     captureHint:
@@ -905,6 +978,9 @@
                     dropNote: "Solte um modelo .glb aqui",
                     langTitle: "Idioma",
                     modelTitle: "Modelo de iPhone",
+                    orientationTitle: "Orientação",
+                    orientationPortrait: "Vertical",
+                    orientationLandscape: "Paisagem",
                     captureTitle: "Captura de ecrã",
                     btnImport: "Importar captura de ecrã…",
                     captureHint:
@@ -952,6 +1028,9 @@
                     dropNote: ".glb モデルをここにドロップ",
                     langTitle: "言語",
                     modelTitle: "iPhoneモデル",
+                    orientationTitle: "画面の向き",
+                    orientationPortrait: "縦向き",
+                    orientationLandscape: "横向き",
                     captureTitle: "スクリーンショット",
                     btnImport: "スクリーンショットをインポート…",
                     captureHint:
@@ -998,6 +1077,9 @@
                     dropNote: "将 .glb 模型拖放到此处",
                     langTitle: "语言",
                     modelTitle: "iPhone 型号",
+                    orientationTitle: "屏幕方向",
+                    orientationPortrait: "竖屏",
+                    orientationLandscape: "横屏",
                     captureTitle: "屏幕截图",
                     btnImport: "导入截图…",
                     captureHint:
@@ -1142,8 +1224,12 @@
             scene.add(new THREE.AmbientLight(0xffffff, 0.35));
 
             // --- Model rig ---
+            // orientRig: portrait/landscape device roll only (Z axis). Wraps rig so ad-angle presets and
+            // auto-spin (which drive rig's own rotation) stay completely independent of device orientation.
+            const orientRig = new THREE.Group();
+            scene.add(orientRig);
             const rig = new THREE.Group(); // everything rotates together
-            scene.add(rig);
+            orientRig.add(rig);
             let modelGroup = null;
 
             // Each model's screen material (currentModel.screenMat) gets its emissiveMap swapped with the
@@ -1603,6 +1689,35 @@
                 anim = requestAnimationFrame(tween);
             }
 
+            // --- Device orientation (portrait / landscape) ---
+            // A physical roll of orientRig only; independent of applyPreset's rig.y/rig.z ad-angle tween.
+            // Landscape rolls the phone so the Dynamic Island (top edge in portrait) swings to the left.
+            let deviceOrientation = "portrait";
+            const LANDSCAPE_ROLL = Math.PI / 2;
+            let orientAnim = null;
+            function setDeviceOrientation(mode, opts) {
+                opts = opts || {};
+                if (deviceOrientation === mode && !opts.force) return;
+                deviceOrientation = mode;
+                document
+                    .querySelectorAll("#orientation-switch button")
+                    .forEach((b) => {
+                        b.classList.toggle("active", b.dataset.orient === mode);
+                    });
+                const targetZ = mode === "landscape" ? LANDSCAPE_ROLL : 0;
+                const startZ = orientRig.rotation.z;
+                const t0 = performance.now(),
+                    dur = 500;
+                cancelAnimationFrame(orientAnim);
+                function tween(now) {
+                    const k = Math.min(1, (now - t0) / dur);
+                    const e = 1 - Math.pow(1 - k, 3); // easeOutCubic
+                    orientRig.rotation.z = startZ + (targetZ - startZ) * e;
+                    if (k < 1) orientAnim = requestAnimationFrame(tween);
+                }
+                orientAnim = requestAnimationFrame(tween);
+            }
+
             // Build preset buttons (rebuildable so a language switch re-renders their labels)
             const presetWrap = document.getElementById("presets");
             function buildPresetButtons() {
@@ -1625,6 +1740,12 @@
             }
             btnSpinEl.onclick = () => setAutoSpin(!autoSpin);
 
+            document
+                .querySelectorAll("#orientation-switch button")
+                .forEach((b) => {
+                    b.onclick = () => setDeviceOrientation(b.dataset.orient);
+                });
+
             const fileShot = document.getElementById("file-shot");
             let lastShotImg = null; // raw imported image, kept so model switches can recompose per-model framing
             // Live color filters applied to the imported screenshot.
@@ -1641,6 +1762,21 @@
                     f.sat / 100 +
                     ")"
                 );
+            }
+            // Landscape sources (width > height) cover-fit into the portrait screen canvas so aggressively that
+            // almost all content gets cropped out. Rotate them 90° into portrait first so the full frame survives.
+            function toPortraitSource(img) {
+                const w = img.width,
+                    h = img.height;
+                if (w <= h) return img;
+                const c = document.createElement("canvas");
+                c.width = h;
+                c.height = w;
+                const g = c.getContext("2d");
+                g.translate(h / 2, w / 2);
+                g.rotate(Math.PI / 2);
+                g.drawImage(img, -w / 2, -h / 2);
+                return c;
             }
             // Draw the imported screenshot onto a canvas. Models whose glb lacks a bezel (screenInset) get a
             // black border with rounded inner corners composited around the screenshot.
@@ -1690,8 +1826,18 @@
                 const url = URL.createObjectURL(f);
                 const img = new Image();
                 img.onload = () => {
-                    lastShotImg = img;
-                    const canvas = composeScreenCanvas(img);
+                    // Match the device orientation to the source's own shape, so the phone itself matches
+                    // what's on its screen: landscape source -> landscape device, portrait source -> portrait.
+                    if (img.width > img.height && deviceOrientation === "portrait") {
+                        setDeviceOrientation("landscape");
+                    } else if (
+                        img.width <= img.height &&
+                        deviceOrientation === "landscape"
+                    ) {
+                        setDeviceOrientation("portrait");
+                    }
+                    lastShotImg = toPortraitSource(img);
+                    const canvas = composeScreenCanvas(lastShotImg);
                     const tex = new THREE.CanvasTexture(canvas);
                     setScreenTexture(tex);
                     URL.revokeObjectURL(url);
@@ -2221,7 +2367,7 @@
             const bootImg = new Image();
             bootImg.crossOrigin = "anonymous";
             bootImg.onload = () => {
-                lastShotImg = bootImg;
+                lastShotImg = toPortraitSource(bootImg);
                 loadModelCfg(MODELS[0]);
             };
             bootImg.onerror = () => loadModelCfg(MODELS[0]); // missing default → boot with model wallpaper
