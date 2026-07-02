@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>iPhone 15 Pro — 3D screenshot mockup</title>
+        <title data-i18n="pageTitle">iPhone 15 Pro — 3D screenshot mockup</title>
         <style>
             :root {
                 --bg: #ffffff;
@@ -58,7 +58,7 @@
                 overflow-y: auto;
                 display: flex;
                 flex-direction: column;
-                gap: 18px;
+                gap: 11px;
             }
             h1 {
                 font-size: 15px;
@@ -259,7 +259,7 @@
                     box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.12); /* subtle edge, no dark smear on the white bg */
                     padding: 0 18px calc(18px + env(safe-area-inset-bottom))
                         18px;
-                    gap: 16px;
+                    gap: 10px;
                     z-index: 20;
                     /* Collapsed by default: only the handle + a peek row show above the fold */
                     transform: translateY(calc(var(--sheet-h) - var(--peek)));
@@ -361,7 +361,7 @@
                     padding: 16px 16px calc(80px + env(safe-area-inset-bottom))
                         16px;
                     padding-right: calc(16px + env(safe-area-inset-right));
-                    gap: 14px;
+                    gap: 9px;
                 }
                 #panel h1 {
                     display: none;
@@ -380,9 +380,9 @@
             <div id="canvas-wrap"></div>
             <div id="loader">
                 <div class="spinner"></div>
-                Loading iPhone 15 Pro…
+                <span data-i18n="loading">Loading iPhone 15 Pro…</span>
             </div>
-            <div id="drop-note">Drop a .glb model here</div>
+            <div id="drop-note" data-i18n="dropNote">Drop a .glb model here</div>
         </div>
 
         <aside id="panel">
@@ -390,19 +390,25 @@
             <h1>Phone mockup <span>studio</span></h1>
 
             <div class="group">
-                <div class="group-title">iPhone model</div>
+                <div class="group-title" data-i18n="langTitle">Language</div>
+                <select id="lang-select"></select>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="group">
+                <div class="group-title" data-i18n="modelTitle">iPhone model</div>
                 <select id="model-select"></select>
             </div>
 
             <div class="divider"></div>
 
             <div class="group">
-                <div class="group-title">Screen capture</div>
+                <div class="group-title" data-i18n="captureTitle">Screen capture</div>
                 <button class="primary" id="btn-import">
-                    <i></i>Import screenshot…
+                    <i></i><span data-i18n="btnImport">Import screenshot…</span>
                 </button>
-                <button id="btn-clear-shot">Clear screen</button>
-                <div class="hint">
+                <div class="hint" data-i18n="captureHint">
                     Use an iPhone screenshot (portrait). It maps onto the glass
                     and rotates in 3D.
                 </div>
@@ -411,10 +417,12 @@
             <div class="divider"></div>
 
             <details open id="filters-block">
-                <summary>Screen filters</summary>
+                <summary data-i18n="filtersTitle">Screen filters</summary>
                 <div class="group" style="margin-top: 4px">
                     <div class="slider-row">
-                        <label>Brightness <b id="v-f-bri">100%</b></label
+                        <label
+                            ><span data-i18n="brightness">Brightness</span>
+                            <b id="v-f-bri">100%</b></label
                         ><input
                             type="range"
                             id="f-bri"
@@ -424,7 +432,9 @@
                         />
                     </div>
                     <div class="slider-row">
-                        <label>Contrast <b id="v-f-con">100%</b></label
+                        <label
+                            ><span data-i18n="contrast">Contrast</span>
+                            <b id="v-f-con">100%</b></label
                         ><input
                             type="range"
                             id="f-con"
@@ -434,7 +444,9 @@
                         />
                     </div>
                     <div class="slider-row">
-                        <label>Saturation <b id="v-f-sat">100%</b></label
+                        <label
+                            ><span data-i18n="saturation">Saturation</span>
+                            <b id="v-f-sat">100%</b></label
                         ><input
                             type="range"
                             id="f-sat"
@@ -443,26 +455,32 @@
                             value="100"
                         />
                     </div>
-                    <button id="btn-filters-reset">Reset filters</button>
-                    <div class="hint">Applies live to the imported screenshot.</div>
+                    <button id="btn-filters-reset" data-i18n="btnResetFilters">
+                        Reset filters
+                    </button>
+                    <div class="hint" data-i18n="filtersHint">
+                        Applies live to the imported screenshot.
+                    </div>
                 </div>
             </details>
 
             <div class="divider"></div>
 
             <div class="group">
-                <div class="group-title">Ad angles</div>
+                <div class="group-title" data-i18n="anglesTitle">Ad angles</div>
                 <div class="preset-grid" id="presets"></div>
-                <button id="btn-spin">Toggle auto-spin</button>
+                <button id="btn-spin" data-i18n="btnSpin">Toggle auto-spin</button>
             </div>
 
             <div class="divider"></div>
 
             <details open>
-                <summary>Scene</summary>
+                <summary data-i18n="sceneTitle">Scene</summary>
                 <div class="group" style="margin-top: 4px">
                     <div class="slider-row">
-                        <label>Brightness <b id="v-env">100%</b></label
+                        <label
+                            ><span data-i18n="brightness">Brightness</span>
+                            <b id="v-env">100%</b></label
                         ><input
                             type="range"
                             id="env"
@@ -471,8 +489,7 @@
                             value="100"
                         />
                     </div>
-                    <button id="btn-model">Load different .glb…</button>
-                    <div class="hint">
+                    <div class="hint" data-i18n="sceneHint">
                         Drag &amp; drop a .glb onto the viewport anytime.
                     </div>
                 </div>
@@ -488,18 +505,14 @@
             >
                 <div class="hint" id="status"></div>
                 <button class="primary" id="btn-download">
-                    <i></i>Download PNG (transparent)
+                    <i></i><span id="btn-download-label" data-i18n="btnDownload"
+                        >Download PNG (transparent)</span
+                    >
                 </button>
             </div>
         </aside>
 
         <input type="file" id="file-shot" accept="image/*" hidden />
-        <input
-            type="file"
-            id="file-model"
-            accept=".glb,.gltf,model/gltf-binary"
-            hidden
-        />
 
         <script type="importmap">
             {
@@ -600,6 +613,420 @@
             ];
             let currentModel = MODELS[0];
             const EMBEDDED_MODELS = null; // standalone build replaces this with {id: base64, ...}
+
+            // --- i18n ---
+            // Keys mirror data-i18n attributes in the HTML + status/preset strings referenced from JS.
+            const TRANSLATIONS = {
+                en: {
+                    name: "English",
+                    pageTitle: "iPhone 15 Pro — 3D screenshot mockup",
+                    loading: "Loading iPhone 15 Pro…",
+                    dropNote: "Drop a .glb model here",
+                    langTitle: "Language",
+                    modelTitle: "iPhone model",
+                    captureTitle: "Screen capture",
+                    btnImport: "Import screenshot…",
+                    captureHint:
+                        "Use an iPhone screenshot (portrait). It maps onto the glass and rotates in 3D.",
+                    filtersTitle: "Screen filters",
+                    brightness: "Brightness",
+                    contrast: "Contrast",
+                    saturation: "Saturation",
+                    btnResetFilters: "Reset filters",
+                    filtersHint: "Applies live to the imported screenshot.",
+                    anglesTitle: "Ad angles",
+                    btnSpin: "Toggle auto-spin",
+                    sceneTitle: "Scene",
+                    sceneHint: "Drag & drop a .glb onto the viewport anytime.",
+                    btnDownload: "Download PNG (transparent)",
+                    btnSaveImage: "Save image",
+                    statusModelLoaded: "Model loaded · {name}",
+                    statusModelLoadedFile: "Model loaded · {name}",
+                    statusScreenNotFound:
+                        "Loaded, but screen material not found — use a different .glb.",
+                    statusLoadFailed: "Load failed.",
+                    statusScreenshot: "Screenshot: {name}",
+                    statusImageFailed: "Couldn't load image.",
+                    statusNothingToExport: "Nothing to export.",
+                    statusDownloaded: "Downloaded {w}×{h} ({kb} KB)",
+                    statusSaved: "Saved · {w}×{h}",
+                    statusReady: "Ready · {w}×{h}",
+                    loadErrorTitle: "Couldn't load model.",
+                    loadErrorHint:
+                        "Open this HTML next to the .glb, or drop a file in.",
+                    presetHero: "Hero",
+                    presetStraight: "Straight",
+                    presetFloating: "Floating",
+                    presetTiltLeft: "Tilt left",
+                    presetTiltRight: "Tilt right",
+                    presetBack: "Back",
+                    presetLowAngle: "Low angle",
+                    presetTopDown: "Top down",
+                },
+                fr: {
+                    name: "Français",
+                    pageTitle: "iPhone 15 Pro — Maquette 3D",
+                    loading: "Chargement de l'iPhone 15 Pro…",
+                    dropNote: "Déposez un modèle .glb ici",
+                    langTitle: "Langue",
+                    modelTitle: "Modèle d'iPhone",
+                    captureTitle: "Capture d'écran",
+                    btnImport: "Importer une capture d'écran…",
+                    captureHint:
+                        "Utilisez une capture d'écran iPhone (portrait). Elle s'applique sur l'écran et tourne en 3D.",
+                    filtersTitle: "Filtres d'écran",
+                    brightness: "Luminosité",
+                    contrast: "Contraste",
+                    saturation: "Saturation",
+                    btnResetFilters: "Réinitialiser les filtres",
+                    filtersHint: "S'applique en direct à la capture importée.",
+                    anglesTitle: "Angles publicitaires",
+                    btnSpin: "Rotation automatique",
+                    sceneTitle: "Scène",
+                    sceneHint:
+                        "Glissez-déposez un .glb dans la zone 3D à tout moment.",
+                    btnDownload: "Télécharger le PNG (transparent)",
+                    btnSaveImage: "Enregistrer l'image",
+                    statusModelLoaded: "Modèle chargé · {name}",
+                    statusModelLoadedFile: "Modèle chargé · {name}",
+                    statusScreenNotFound:
+                        "Chargé, mais matériau d'écran introuvable — essayez un autre .glb.",
+                    statusLoadFailed: "Échec du chargement.",
+                    statusScreenshot: "Capture d'écran : {name}",
+                    statusImageFailed: "Impossible de charger l'image.",
+                    statusNothingToExport: "Rien à exporter.",
+                    statusDownloaded: "Téléchargé {w}×{h} ({kb} Ko)",
+                    statusSaved: "Enregistré · {w}×{h}",
+                    statusReady: "Prêt · {w}×{h}",
+                    loadErrorTitle: "Impossible de charger le modèle.",
+                    loadErrorHint:
+                        "Ouvrez ce fichier HTML à côté du .glb, ou déposez un fichier.",
+                    presetHero: "Héros",
+                    presetStraight: "Face",
+                    presetFloating: "Flottant",
+                    presetTiltLeft: "Inclinaison gauche",
+                    presetTiltRight: "Inclinaison droite",
+                    presetBack: "Dos",
+                    presetLowAngle: "Contre-plongée",
+                    presetTopDown: "Vue de dessus",
+                },
+                es: {
+                    name: "Español",
+                    pageTitle: "iPhone 15 Pro — Maqueta 3D",
+                    loading: "Cargando iPhone 15 Pro…",
+                    dropNote: "Suelta un modelo .glb aquí",
+                    langTitle: "Idioma",
+                    modelTitle: "Modelo de iPhone",
+                    captureTitle: "Captura de pantalla",
+                    btnImport: "Importar captura de pantalla…",
+                    captureHint:
+                        "Usa una captura de pantalla de iPhone (vertical). Se aplica sobre el cristal y gira en 3D.",
+                    filtersTitle: "Filtros de pantalla",
+                    brightness: "Brillo",
+                    contrast: "Contraste",
+                    saturation: "Saturación",
+                    btnResetFilters: "Restablecer filtros",
+                    filtersHint: "Se aplica en vivo a la captura importada.",
+                    anglesTitle: "Ángulos publicitarios",
+                    btnSpin: "Rotación automática",
+                    sceneTitle: "Escena",
+                    sceneHint:
+                        "Arrastra y suelta un .glb en la vista 3D en cualquier momento.",
+                    btnDownload: "Descargar PNG (transparente)",
+                    btnSaveImage: "Guardar imagen",
+                    statusModelLoaded: "Modelo cargado · {name}",
+                    statusModelLoadedFile: "Modelo cargado · {name}",
+                    statusScreenNotFound:
+                        "Cargado, pero no se encontró el material de pantalla — prueba otro .glb.",
+                    statusLoadFailed: "Error al cargar.",
+                    statusScreenshot: "Captura de pantalla: {name}",
+                    statusImageFailed: "No se pudo cargar la imagen.",
+                    statusNothingToExport: "Nada que exportar.",
+                    statusDownloaded: "Descargado {w}×{h} ({kb} KB)",
+                    statusSaved: "Guardado · {w}×{h}",
+                    statusReady: "Listo · {w}×{h}",
+                    loadErrorTitle: "No se pudo cargar el modelo.",
+                    loadErrorHint:
+                        "Abre este HTML junto al .glb, o suelta un archivo.",
+                    presetHero: "Héroe",
+                    presetStraight: "Frontal",
+                    presetFloating: "Flotante",
+                    presetTiltLeft: "Inclinación izquierda",
+                    presetTiltRight: "Inclinación derecha",
+                    presetBack: "Trasera",
+                    presetLowAngle: "Contrapicado",
+                    presetTopDown: "Vista superior",
+                },
+                de: {
+                    name: "Deutsch",
+                    pageTitle: "iPhone 15 Pro — 3D-Mockup",
+                    loading: "iPhone 15 Pro wird geladen…",
+                    dropNote: "Ziehe eine .glb-Datei hierher",
+                    langTitle: "Sprache",
+                    modelTitle: "iPhone-Modell",
+                    captureTitle: "Screenshot",
+                    btnImport: "Screenshot importieren…",
+                    captureHint:
+                        "Verwende einen iPhone-Screenshot (Hochformat). Er wird auf das Display gelegt und in 3D gedreht.",
+                    filtersTitle: "Bildschirmfilter",
+                    brightness: "Helligkeit",
+                    contrast: "Kontrast",
+                    saturation: "Sättigung",
+                    btnResetFilters: "Filter zurücksetzen",
+                    filtersHint: "Wird live auf den importierten Screenshot angewendet.",
+                    anglesTitle: "Werbe-Winkel",
+                    btnSpin: "Auto-Drehung umschalten",
+                    sceneTitle: "Szene",
+                    sceneHint:
+                        "Jederzeit eine .glb-Datei in die 3D-Ansicht ziehen.",
+                    btnDownload: "PNG herunterladen (transparent)",
+                    btnSaveImage: "Bild speichern",
+                    statusModelLoaded: "Modell geladen · {name}",
+                    statusModelLoadedFile: "Modell geladen · {name}",
+                    statusScreenNotFound:
+                        "Geladen, aber Bildschirmmaterial nicht gefunden — andere .glb verwenden.",
+                    statusLoadFailed: "Laden fehlgeschlagen.",
+                    statusScreenshot: "Screenshot: {name}",
+                    statusImageFailed: "Bild konnte nicht geladen werden.",
+                    statusNothingToExport: "Nichts zu exportieren.",
+                    statusDownloaded: "Heruntergeladen {w}×{h} ({kb} KB)",
+                    statusSaved: "Gespeichert · {w}×{h}",
+                    statusReady: "Bereit · {w}×{h}",
+                    loadErrorTitle: "Modell konnte nicht geladen werden.",
+                    loadErrorHint:
+                        "Öffne diese HTML-Datei neben der .glb-Datei oder ziehe eine Datei hinein.",
+                    presetHero: "Hero",
+                    presetStraight: "Gerade",
+                    presetFloating: "Schwebend",
+                    presetTiltLeft: "Neigung links",
+                    presetTiltRight: "Neigung rechts",
+                    presetBack: "Rückseite",
+                    presetLowAngle: "Untersicht",
+                    presetTopDown: "Draufsicht",
+                },
+                it: {
+                    name: "Italiano",
+                    pageTitle: "iPhone 15 Pro — Mockup 3D",
+                    loading: "Caricamento di iPhone 15 Pro…",
+                    dropNote: "Trascina qui un modello .glb",
+                    langTitle: "Lingua",
+                    modelTitle: "Modello iPhone",
+                    captureTitle: "Screenshot",
+                    btnImport: "Importa screenshot…",
+                    captureHint:
+                        "Usa uno screenshot iPhone (verticale). Viene applicato sul vetro e ruota in 3D.",
+                    filtersTitle: "Filtri schermo",
+                    brightness: "Luminosità",
+                    contrast: "Contrasto",
+                    saturation: "Saturazione",
+                    btnResetFilters: "Reimposta filtri",
+                    filtersHint: "Applicato in tempo reale allo screenshot importato.",
+                    anglesTitle: "Angolazioni pubblicitarie",
+                    btnSpin: "Attiva/disattiva rotazione automatica",
+                    sceneTitle: "Scena",
+                    sceneHint:
+                        "Trascina un .glb nella vista 3D in qualsiasi momento.",
+                    btnDownload: "Scarica PNG (trasparente)",
+                    btnSaveImage: "Salva immagine",
+                    statusModelLoaded: "Modello caricato · {name}",
+                    statusModelLoadedFile: "Modello caricato · {name}",
+                    statusScreenNotFound:
+                        "Caricato, ma materiale schermo non trovato — prova un altro .glb.",
+                    statusLoadFailed: "Caricamento non riuscito.",
+                    statusScreenshot: "Screenshot: {name}",
+                    statusImageFailed: "Impossibile caricare l'immagine.",
+                    statusNothingToExport: "Niente da esportare.",
+                    statusDownloaded: "Scaricato {w}×{h} ({kb} KB)",
+                    statusSaved: "Salvato · {w}×{h}",
+                    statusReady: "Pronto · {w}×{h}",
+                    loadErrorTitle: "Impossibile caricare il modello.",
+                    loadErrorHint:
+                        "Apri questo HTML accanto al .glb, oppure trascina un file.",
+                    presetHero: "Hero",
+                    presetStraight: "Frontale",
+                    presetFloating: "Fluttuante",
+                    presetTiltLeft: "Inclinazione sinistra",
+                    presetTiltRight: "Inclinazione destra",
+                    presetBack: "Retro",
+                    presetLowAngle: "Dal basso",
+                    presetTopDown: "Dall'alto",
+                },
+                pt: {
+                    name: "Português",
+                    pageTitle: "iPhone 15 Pro — Maquete 3D",
+                    loading: "A carregar o iPhone 15 Pro…",
+                    dropNote: "Solte um modelo .glb aqui",
+                    langTitle: "Idioma",
+                    modelTitle: "Modelo de iPhone",
+                    captureTitle: "Captura de ecrã",
+                    btnImport: "Importar captura de ecrã…",
+                    captureHint:
+                        "Use uma captura de ecrã do iPhone (vertical). Ela é aplicada ao ecrã e roda em 3D.",
+                    filtersTitle: "Filtros de ecrã",
+                    brightness: "Brilho",
+                    contrast: "Contraste",
+                    saturation: "Saturação",
+                    btnResetFilters: "Repor filtros",
+                    filtersHint: "Aplicado em direto à captura importada.",
+                    anglesTitle: "Ângulos publicitários",
+                    btnSpin: "Alternar rotação automática",
+                    sceneTitle: "Cena",
+                    sceneHint:
+                        "Arraste e solte um .glb na vista 3D a qualquer momento.",
+                    btnDownload: "Transferir PNG (transparente)",
+                    btnSaveImage: "Guardar imagem",
+                    statusModelLoaded: "Modelo carregado · {name}",
+                    statusModelLoadedFile: "Modelo carregado · {name}",
+                    statusScreenNotFound:
+                        "Carregado, mas material do ecrã não encontrado — experimente outro .glb.",
+                    statusLoadFailed: "Falha ao carregar.",
+                    statusScreenshot: "Captura de ecrã: {name}",
+                    statusImageFailed: "Não foi possível carregar a imagem.",
+                    statusNothingToExport: "Nada para exportar.",
+                    statusDownloaded: "Transferido {w}×{h} ({kb} KB)",
+                    statusSaved: "Guardado · {w}×{h}",
+                    statusReady: "Pronto · {w}×{h}",
+                    loadErrorTitle: "Não foi possível carregar o modelo.",
+                    loadErrorHint:
+                        "Abra este HTML junto ao .glb, ou solte um ficheiro.",
+                    presetHero: "Hero",
+                    presetStraight: "Frontal",
+                    presetFloating: "Flutuante",
+                    presetTiltLeft: "Inclinação esquerda",
+                    presetTiltRight: "Inclinação direita",
+                    presetBack: "Traseira",
+                    presetLowAngle: "Ângulo baixo",
+                    presetTopDown: "Vista superior",
+                },
+                ja: {
+                    name: "日本語",
+                    pageTitle: "iPhone 15 Pro — 3Dモックアップ",
+                    loading: "iPhone 15 Pro を読み込み中…",
+                    dropNote: ".glb モデルをここにドロップ",
+                    langTitle: "言語",
+                    modelTitle: "iPhoneモデル",
+                    captureTitle: "スクリーンショット",
+                    btnImport: "スクリーンショットをインポート…",
+                    captureHint:
+                        "iPhoneのスクリーンショット（縦向き）を使用してください。画面に貼り付けられ、3Dで回転します。",
+                    filtersTitle: "画面フィルター",
+                    brightness: "明るさ",
+                    contrast: "コントラスト",
+                    saturation: "彩度",
+                    btnResetFilters: "フィルターをリセット",
+                    filtersHint: "インポートしたスクリーンショットにリアルタイムで適用されます。",
+                    anglesTitle: "広告アングル",
+                    btnSpin: "自動回転の切り替え",
+                    sceneTitle: "シーン",
+                    sceneHint: ".glbファイルをいつでもビューポートにドラッグ＆ドロップできます。",
+                    btnDownload: "PNGをダウンロード（透過）",
+                    btnSaveImage: "画像を保存",
+                    statusModelLoaded: "モデルを読み込みました · {name}",
+                    statusModelLoadedFile: "モデルを読み込みました · {name}",
+                    statusScreenNotFound:
+                        "読み込みましたが、画面のマテリアルが見つかりません — 別の.glbを試してください。",
+                    statusLoadFailed: "読み込みに失敗しました。",
+                    statusScreenshot: "スクリーンショット: {name}",
+                    statusImageFailed: "画像を読み込めませんでした。",
+                    statusNothingToExport: "エクスポートするものがありません。",
+                    statusDownloaded: "ダウンロード完了 {w}×{h} ({kb} KB)",
+                    statusSaved: "保存しました · {w}×{h}",
+                    statusReady: "準備完了 · {w}×{h}",
+                    loadErrorTitle: "モデルを読み込めませんでした。",
+                    loadErrorHint:
+                        "この HTML を .glb と同じ場所で開くか、ファイルをドロップしてください。",
+                    presetHero: "ヒーロー",
+                    presetStraight: "正面",
+                    presetFloating: "浮遊",
+                    presetTiltLeft: "左に傾ける",
+                    presetTiltRight: "右に傾ける",
+                    presetBack: "背面",
+                    presetLowAngle: "ローアングル",
+                    presetTopDown: "上から",
+                },
+                zh: {
+                    name: "中文",
+                    pageTitle: "iPhone 15 Pro — 3D 效果图",
+                    loading: "正在加载 iPhone 15 Pro…",
+                    dropNote: "将 .glb 模型拖放到此处",
+                    langTitle: "语言",
+                    modelTitle: "iPhone 型号",
+                    captureTitle: "屏幕截图",
+                    btnImport: "导入截图…",
+                    captureHint:
+                        "使用 iPhone 截图（竖屏）。它会贴合到屏幕上并进行 3D 旋转。",
+                    filtersTitle: "屏幕滤镜",
+                    brightness: "亮度",
+                    contrast: "对比度",
+                    saturation: "饱和度",
+                    btnResetFilters: "重置滤镜",
+                    filtersHint: "实时应用于导入的截图。",
+                    anglesTitle: "广告角度",
+                    btnSpin: "切换自动旋转",
+                    sceneTitle: "场景",
+                    sceneHint: "随时将 .glb 文件拖放到视口中。",
+                    btnDownload: "下载 PNG（透明）",
+                    btnSaveImage: "保存图片",
+                    statusModelLoaded: "模型已加载 · {name}",
+                    statusModelLoadedFile: "模型已加载 · {name}",
+                    statusScreenNotFound:
+                        "已加载，但未找到屏幕材质 — 请尝试其他 .glb。",
+                    statusLoadFailed: "加载失败。",
+                    statusScreenshot: "截图：{name}",
+                    statusImageFailed: "无法加载图片。",
+                    statusNothingToExport: "没有可导出的内容。",
+                    statusDownloaded: "已下载 {w}×{h}（{kb} KB）",
+                    statusSaved: "已保存 · {w}×{h}",
+                    statusReady: "就绪 · {w}×{h}",
+                    loadErrorTitle: "无法加载模型。",
+                    loadErrorHint: "请在 .glb 旁边打开此 HTML，或拖入文件。",
+                    presetHero: "主视觉",
+                    presetStraight: "正面",
+                    presetFloating: "悬浮",
+                    presetTiltLeft: "左倾",
+                    presetTiltRight: "右倾",
+                    presetBack: "背面",
+                    presetLowAngle: "低角度",
+                    presetTopDown: "俯视",
+                },
+            };
+            const LANG_STORAGE_KEY = "phoneMockupStudio.lang";
+            function detectLang() {
+                const saved = localStorage.getItem(LANG_STORAGE_KEY);
+                if (saved && TRANSLATIONS[saved]) return saved;
+                const candidates = navigator.languages || [
+                    navigator.language || "en",
+                ];
+                for (const tag of candidates) {
+                    const base = tag.slice(0, 2).toLowerCase();
+                    if (TRANSLATIONS[base]) return base;
+                }
+                return "en";
+            }
+            let currentLang = detectLang();
+            function t(key, vars) {
+                const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+                let str = dict[key] ?? TRANSLATIONS.en[key] ?? key;
+                if (vars) {
+                    for (const [k, v] of Object.entries(vars)) {
+                        str = str.replace("{" + k + "}", v);
+                    }
+                }
+                return str;
+            }
+            function applyTranslations() {
+                document.documentElement.lang = currentLang;
+                document.title = t("pageTitle");
+                document.querySelectorAll("[data-i18n]").forEach((el) => {
+                    el.textContent = t(el.getAttribute("data-i18n"));
+                });
+                // Re-sync dynamic bits that data-i18n can't cover on its own
+                syncFilterLabelsIfReady();
+                updateDownloadButtonLabel();
+            }
+            // These two are wired later in the file (after their elements/state exist); guarded no-ops until then.
+            let syncFilterLabelsIfReady = () => {};
+            let updateDownloadButtonLabel = () => {};
 
             const wrap = document.getElementById("canvas-wrap");
             const loaderEl = document.getElementById("loader");
@@ -995,13 +1422,16 @@
                     else if (screenTexture) setScreenTexture(screenTexture);
                     loaderEl.style.display = "none";
                     statusEl.textContent = found
-                        ? "Model loaded · " + cfg.label
-                        : "Loaded, but screen material not found — use a different .glb.";
+                        ? t("statusModelLoaded", { name: cfg.label })
+                        : t("statusScreenNotFound");
                     applyPreset(presets[0]);
                 };
                 const onError = (err) => {
                     loaderEl.innerHTML =
-                        "Couldn't load model.<br><small style='color:#9a9aa8'>Open this HTML next to the .glb, or drop a file in.</small>";
+                        t("loadErrorTitle") +
+                        "<br><small style='color:#9a9aa8'>" +
+                        t("loadErrorHint") +
+                        "</small>";
                     console.error(err);
                 };
                 if (EMBEDDED_MODELS && EMBEDDED_MODELS[cfg.id]) {
@@ -1027,24 +1457,27 @@
                         findScreenMaterial(modelGroup);
                         if (screenTexture) setScreenTexture(screenTexture);
                         loaderEl.style.display = "none";
-                        statusEl.textContent = "Model loaded · " + file.name;
+                        statusEl.textContent = t("statusModelLoadedFile", {
+                            name: file.name,
+                        });
                         URL.revokeObjectURL(url);
                     },
                     undefined,
                     (err) => {
                         console.error(err);
-                        statusEl.textContent = "Load failed.";
+                        statusEl.textContent = t("statusLoadFailed");
                     },
                 );
             }
 
             // --- Ad-style presets ---
             // az/el = camera orbit (deg); dist = zoom; ry/rz = model tilt & roll (rad, ad-style lean)
+            // nameKey = i18n key (translated label rendered into the button at build/refresh time)
             const presets = [
-                { name: "Hero", az: 20, el: 6, dist: 6.0, ry: 0.0, rz: 0.0 },
-                { name: "Straight", az: 0, el: 0, dist: 5.4, ry: 0.0, rz: 0.0 },
+                { nameKey: "presetHero", az: 20, el: 6, dist: 6.0, ry: 0.0, rz: 0.0 },
+                { nameKey: "presetStraight", az: 0, el: 0, dist: 5.4, ry: 0.0, rz: 0.0 },
                 {
-                    name: "Floating",
+                    nameKey: "presetFloating",
                     az: 24,
                     el: 12,
                     dist: 6.4,
@@ -1052,7 +1485,7 @@
                     rz: -0.12,
                 },
                 {
-                    name: "Tilt left",
+                    nameKey: "presetTiltLeft",
                     az: 34,
                     el: 6,
                     dist: 6.1,
@@ -1060,16 +1493,16 @@
                     rz: 0.14,
                 },
                 {
-                    name: "Tilt right",
+                    nameKey: "presetTiltRight",
                     az: -34,
                     el: 6,
                     dist: 6.1,
                     ry: -0.45,
                     rz: -0.14,
                 },
-                { name: "Back", az: 180, el: 6, dist: 6.2, ry: 0.0, rz: 0.0 },
+                { nameKey: "presetBack", az: 180, el: 6, dist: 6.2, ry: 0.0, rz: 0.0 },
                 {
-                    name: "Low angle",
+                    nameKey: "presetLowAngle",
                     az: 16,
                     el: -24,
                     dist: 6.2,
@@ -1077,7 +1510,7 @@
                     rz: 0.06,
                 },
                 {
-                    name: "Top down",
+                    nameKey: "presetTopDown",
                     az: 0,
                     el: 46,
                     dist: 6.6,
@@ -1123,14 +1556,18 @@
                 anim = requestAnimationFrame(tween);
             }
 
-            // Build preset buttons
+            // Build preset buttons (rebuildable so a language switch re-renders their labels)
             const presetWrap = document.getElementById("presets");
-            presets.forEach((p) => {
-                const b = document.createElement("button");
-                b.textContent = p.name;
-                b.onclick = () => applyPreset(p);
-                presetWrap.appendChild(b);
-            });
+            function buildPresetButtons() {
+                presetWrap.innerHTML = "";
+                presets.forEach((p) => {
+                    const b = document.createElement("button");
+                    b.textContent = t(p.nameKey);
+                    b.onclick = () => applyPreset(p);
+                    presetWrap.appendChild(b);
+                });
+            }
+            buildPresetButtons();
 
             // --- UI wiring ---
             let autoSpin = false;
@@ -1208,17 +1645,15 @@
                     const tex = new THREE.CanvasTexture(canvas);
                     setScreenTexture(tex);
                     URL.revokeObjectURL(url);
-                    statusEl.textContent = "Screenshot: " + f.name;
+                    statusEl.textContent = t("statusScreenshot", {
+                        name: f.name,
+                    });
                 };
                 img.onerror = () => {
-                    statusEl.textContent = "Couldn't load image.";
+                    statusEl.textContent = t("statusImageFailed");
                     URL.revokeObjectURL(url);
                 };
                 img.src = url;
-            };
-            document.getElementById("btn-clear-shot").onclick = () => {
-                lastShotImg = null;
-                setScreenTexture(null);
             };
 
             // --- Live screen filters ---
@@ -1233,6 +1668,7 @@
                         screenFilters[c.key] + c.unit;
                 });
             };
+            syncFilterLabelsIfReady = syncFilterLabels; // wire the early forward-declared stub
             filterCtl.forEach((c) => {
                 const el = document.getElementById(c.id);
                 el.oninput = () => {
@@ -1251,18 +1687,10 @@
                 refreshScreenFromShot();
             };
 
-            const fileModel = document.getElementById("file-model");
-            document.getElementById("btn-model").onclick = () =>
-                fileModel.click();
-            fileModel.onchange = (e) => {
-                const f = e.target.files[0];
-                if (f) loadModelFromFile(f);
-            };
-
             // Export the current view as a transparent PNG, auto-cropped to the phone with padding
             const EXPORT_PADDING = 0.02; // fraction of the phone's size added as margin on each side
             // On touch devices with the Web Share API (iOS Safari), label the button "Save image".
-            if (
+            const wantsSaveImageLabel = !!(
                 matchMedia("(pointer: coarse)").matches &&
                 navigator.canShare &&
                 navigator.canShare({
@@ -1270,10 +1698,13 @@
                         new File([new Blob()], "x.png", { type: "image/png" }),
                     ],
                 })
-            ) {
-                document.getElementById("btn-download").textContent =
-                    "Save image";
-            }
+            );
+            updateDownloadButtonLabel = () => {
+                document.getElementById("btn-download-label").textContent = t(
+                    wantsSaveImageLabel ? "btnSaveImage" : "btnDownload",
+                );
+            };
+            updateDownloadButtonLabel();
             document.getElementById("btn-download").onclick = () => {
                 // Render into a FIXED tall frame with the camera framed to fit the whole phone, independent of
                 // the live window size/aspect (so a narrow phone viewport can't clip it). Then crop to the phone.
@@ -1369,7 +1800,7 @@
                     }
                 }
                 if (maxX < minX) {
-                    statusEl.textContent = "Nothing to export.";
+                    statusEl.textContent = t("statusNothingToExport");
                     return;
                 }
 
@@ -1427,14 +1858,11 @@
                     a.click();
                     a.remove();
                     setTimeout(() => URL.revokeObjectURL(url), 4000);
-                    statusEl.textContent =
-                        "Downloaded " +
-                        cw +
-                        "×" +
-                        ch +
-                        " (" +
-                        Math.round(blob.size / 1024) +
-                        " KB)";
+                    statusEl.textContent = t("statusDownloaded", {
+                        w: cw,
+                        h: ch,
+                        kb: Math.round(blob.size / 1024),
+                    });
                 };
 
                 const isTouch = matchMedia("(pointer: coarse)").matches;
@@ -1446,12 +1874,17 @@
                     navigator
                         .share({ files: [file] })
                         .then(() => {
-                            statusEl.textContent = "Saved · " + cw + "×" + ch;
+                            statusEl.textContent = t("statusSaved", {
+                                w: cw,
+                                h: ch,
+                            });
                         })
                         .catch((err) => {
                             if (err && err.name === "AbortError") {
-                                statusEl.textContent =
-                                    "Ready · " + cw + "×" + ch;
+                                statusEl.textContent = t("statusReady", {
+                                    w: cw,
+                                    h: ch,
+                                });
                             } else {
                                 doDownload();
                             }
@@ -1651,16 +2084,18 @@
                     true,
                 );
 
-                // Auto-collapse after picking an action so the phone stays visible
-                panel
-                    .querySelectorAll(
-                        "#presets button, #btn-spin, #btn-download",
-                    )
-                    .forEach((b) => {
-                        b.addEventListener("click", () => {
-                            if (isMobile()) setExpanded(false);
-                        });
-                    });
+                // Auto-collapse after picking an action so the phone stays visible. Delegated on the panel
+                // (rather than bound per-button) so it still works after #presets is rebuilt (language switch).
+                panel.addEventListener("click", (e) => {
+                    if (
+                        e.target.closest(
+                            "#presets button, #btn-spin, #btn-download",
+                        ) &&
+                        isMobile()
+                    ) {
+                        setExpanded(false);
+                    }
+                });
 
                 // Tap the phone area (above the sheet) to close the menu — but not while rotating the model
                 const stageEl = document.getElementById("stage");
@@ -1710,9 +2145,28 @@
             modelSelect.onchange = () =>
                 loadModelCfg(MODELS[+modelSelect.value]);
 
+            // Language picker: auto-detected from the browser (or a saved choice), switchable at any time.
+            const langSelect = document.getElementById("lang-select");
+            Object.keys(TRANSLATIONS).forEach((code) => {
+                const opt = document.createElement("option");
+                opt.value = code;
+                opt.textContent = TRANSLATIONS[code].name;
+                langSelect.appendChild(opt);
+            });
+            langSelect.value = currentLang;
+            langSelect.onchange = () => {
+                currentLang = langSelect.value;
+                localStorage.setItem(LANG_STORAGE_KEY, currentLang);
+                applyTranslations();
+                buildPresetButtons();
+                statusEl.textContent = currentModel
+                    ? t("statusModelLoaded", { name: currentModel.label })
+                    : "";
+            };
+            applyTranslations(); // translate static markup before the first model finishes loading
+
             // Boot: preload the default screenshot into lastShotImg so the first model (and every switch)
-            // composites it automatically via the existing recompose path. "Clear screen" still restores the
-            // model's own wallpaper.
+            // composites it automatically via the existing recompose path.
             const DEFAULT_SHOT_URL = "default-screenshot.jpg";
             const bootImg = new Image();
             bootImg.crossOrigin = "anonymous";
