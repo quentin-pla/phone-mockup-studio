@@ -733,7 +733,7 @@
                 {
                     id: "ip17promax",
                     label: "iPhone 17 Pro Max",
-                    url: "source/iphone_17_pro_max.glb",
+                    url: "source/iphone_17_pro_max.glb?v=68",
                     screenMat: "screen.001",
                     rot: [0, Math.PI / 2, 0],
                     // Visible face of the screen mesh samples u -0.9528..0.0197, v 0.0019..1.0019 (the other
@@ -749,6 +749,12 @@
                     // black.002 is the front black surround; its only VISIBLE part is the Dynamic Island pill (the
                     // rest sits behind the screen/glass). By default it's lit + tone-mapped, rendering light gray —
                     // lock it to the same flat unlit deep black as the 15 Pro Max island.
+                    // Frame/rails/back: real "Cosmic Orange" = anodized aluminium — a DEEP saturated orange with a
+                    // fine bead-blasted micro-sparkle and a soft metallic sheen (bright on the frame edges/chamfers,
+                    // matte on the flat back). The scene light rig is bright, so metallic surfaces wash pale — the
+                    // base colors are deliberately deep/burnt so they land on cosmic orange after the wash. High
+                    // roughness on the flat panels stops the front light forming a hotspot (the Apple logo shares
+                    // basecolor.001, so a low-roughness frame lit the logo as a bright blob).
                     tweaks: {
                         "black.002": {
                             color: 0x000000,
@@ -758,6 +764,54 @@
                             roughness: 1,
                             envMapIntensity: 0,
                             toneMapped: false,
+                        },
+                        // Frame face: visible sandblast grain; high roughness (the flat area shouldn't hotspot).
+                        "basecolor.001": {
+                            color: 0xac3d04,
+                            metalness: 0.55,
+                            roughness: 0.8,
+                            envMapIntensity: 0.42,
+                            anodized: { repeat: [38, 72], normalScale: 0.16 },
+                        },
+                        // Apple logo (split off from basecolor.001 into its own material): slightly DARKER than the
+                        // back panel + fine grain, so it reads as a subtle recessed logo. polygonOffset pulls it
+                        // forward so it wins the depth test against the back panel (Material.005) — no z-fight streaks.
+                        logo_face: {
+                            color: 0x9d3804,
+                            metalness: 0.4,
+                            roughness: 0.88,
+                            envMapIntensity: 0.28,
+                            anodized: { repeat: [40, 55], normalScale: 0.03, fine: true },
+                            polygonOffset: true,
+                            polygonOffsetFactor: -4,
+                            polygonOffsetUnits: -4,
+                        },
+                        // Side rails/chamfers + camera lens rings (shared material): grainy anodized finish to match
+                        // the body — low-ish metalness + high roughness so the rings read as sandblasted, not shiny
+                        // metal (per request: lens should adopt the grain texture, not a mirror-metal ring).
+                        "metalframe.002": {
+                            color: 0xa83a02,
+                            metalness: 0.5,
+                            roughness: 0.82,
+                            envMapIntensity: 0.35,
+                            anodized: { repeat: [40, 40], normalScale: 0.16 },
+                        },
+                        // Back panels use the FINE-only grain (no coarse octave) so the big flat area stays smooth
+                        // and even. Color is the base cosmic orange lightened ~1.1x (the logo container).
+                        "backpanel.001": {
+                            color: 0xbd4304,
+                            metalness: 0.5,
+                            roughness: 0.82,
+                            envMapIntensity: 0.35,
+                            anodized: { repeat: [40, 55], normalScale: 0.05, fine: true },
+                        },
+                        // Big flat back panel (the Apple-logo container): subtle FINE grain + matte satin, ~1.1x lighter.
+                        "Material.005": {
+                            color: 0xbd4304,
+                            metalness: 0.5,
+                            roughness: 0.82,
+                            envMapIntensity: 0.35,
+                            anodized: { repeat: [40, 55], normalScale: 0.05, fine: true },
                         },
                     },
                 },
@@ -1543,6 +1597,90 @@
             const texLoader = new THREE.TextureLoader();
             let screenTexture = null;
 
+            // Bead-blasted "anodized aluminium" grain for the 17 Pro Max Cosmic Orange finish. Two variants:
+            //   default = a coarse-visible sandblast + fine speckle -> the grainy frame/rails/plateau.
+            //   fine    = a single fine octave only -> the SMOOTH back panel (the coarse octave read as an ugly
+            //             mottled splotch on that big flat area, so the back gets the fine grain alone).
+            // Each is a tangent-space normal map + matching roughness-variation map; the caller tiles (repeat) and
+            // scales (normalScale) per material. Built once, shared.
+            const _anodizedCache = {};
+            function getAnodizedMaps(fine) {
+                const key = fine ? "fine" : "default";
+                if (_anodizedCache[key]) return _anodizedCache[key];
+                const N = 512;
+                // Tileable value-noise field at `cells` resolution, smooth-upsampled to N×N.
+                const valueNoise = (cells, seed0) => {
+                    const g = new Float32Array(cells * cells);
+                    let s = seed0;
+                    const r = () => {
+                        s = (s * 1103515245 + 12345) & 0x7fffffff;
+                        return s / 0x7fffffff;
+                    };
+                    for (let i = 0; i < cells * cells; i++) g[i] = r();
+                    const out = new Float32Array(N * N);
+                    for (let y = 0; y < N; y++)
+                        for (let x = 0; x < N; x++) {
+                            const fx = (x / N) * cells, fy = (y / N) * cells;
+                            const x0 = Math.floor(fx) % cells, y0 = Math.floor(fy) % cells;
+                            const x1 = (x0 + 1) % cells, y1 = (y0 + 1) % cells;
+                            const tx = fx - Math.floor(fx), ty = fy - Math.floor(fy);
+                            const a = g[y0 * cells + x0], b = g[y0 * cells + x1];
+                            const c = g[y1 * cells + x0], d = g[y1 * cells + x1];
+                            const sx = tx * tx * (3 - 2 * tx), sy = ty * ty * (3 - 2 * ty);
+                            out[y * N + x] =
+                                a * (1 - sx) * (1 - sy) + b * sx * (1 - sy) + c * (1 - sx) * sy + d * sx * sy;
+                        }
+                    return out;
+                };
+                const hb = new Float32Array(N * N);
+                if (fine) {
+                    const f = valueNoise(300, 55555); // fine octave only -> no coarse mottle
+                    for (let i = 0; i < N * N; i++) hb[i] = f[i];
+                } else {
+                    const coarse = valueNoise(96, 98765), fineN = valueNoise(220, 98765);
+                    for (let i = 0; i < N * N; i++) hb[i] = coarse[i] * 0.7 + fineN[i] * 0.3;
+                }
+                // normal map from the height gradient
+                const nCanvas = document.createElement("canvas");
+                nCanvas.width = nCanvas.height = N;
+                const nCtx = nCanvas.getContext("2d");
+                const nImg = nCtx.createImageData(N, N);
+                const STR = 4.0;
+                for (let y = 0; y < N; y++)
+                    for (let x = 0; x < N; x++) {
+                        const dx = (hb[y * N + ((x + 1) % N)] - hb[y * N + ((x - 1 + N) % N)]) * STR;
+                        const dy = (hb[((y + 1) % N) * N + x] - hb[((y - 1 + N) % N) * N + x]) * STR;
+                        let nx = -dx, ny = -dy, nz = 1;
+                        const len = Math.hypot(nx, ny, nz);
+                        nx /= len; ny /= len; nz /= len;
+                        const idx = (y * N + x) * 4;
+                        nImg.data[idx] = Math.round((nx * 0.5 + 0.5) * 255);
+                        nImg.data[idx + 1] = Math.round((ny * 0.5 + 0.5) * 255);
+                        nImg.data[idx + 2] = Math.round((nz * 0.5 + 0.5) * 255);
+                        nImg.data[idx + 3] = 255;
+                    }
+                nCtx.putImageData(nImg, 0, 0);
+                const normalMap = new THREE.CanvasTexture(nCanvas);
+                normalMap.wrapS = normalMap.wrapT = THREE.RepeatWrapping;
+                // roughness-variation map (same speckle, mid-gray band; tighter for the fine variant)
+                const rCanvas = document.createElement("canvas");
+                rCanvas.width = rCanvas.height = N;
+                const rCtx = rCanvas.getContext("2d");
+                const rImg = rCtx.createImageData(N, N);
+                const rBase = fine ? 140 : 120, rAmp = fine ? 50 : 90;
+                for (let i = 0; i < N * N; i++) {
+                    const v = Math.round(rBase + hb[i] * rAmp);
+                    const idx = i * 4;
+                    rImg.data[idx] = rImg.data[idx + 1] = rImg.data[idx + 2] = v;
+                    rImg.data[idx + 3] = 255;
+                }
+                rCtx.putImageData(rImg, 0, 0);
+                const roughnessMap = new THREE.CanvasTexture(rCanvas);
+                roughnessMap.wrapS = roughnessMap.wrapT = THREE.RepeatWrapping;
+                _anodizedCache[key] = { normalMap, roughnessMap };
+                return _anodizedCache[key];
+            }
+
             const gltfLoader = new GLTFLoader();
 
             function clearModel() {
@@ -1577,6 +1715,7 @@
 
             const bodyMats = []; // dark body materials we brighten; {mat, base:Color}
             const logoMeshes = []; // Apple-logo mesh(es), lifted off the shell to stop z-fighting
+
 
             function findScreenMaterial(root) {
                 screenMaterial = null;
@@ -1623,6 +1762,33 @@
                                         m.emissive = new THREE.Color(0xffffff);
                                         m.toneMapped = false;
                                     }
+                                } else if (k === "stripMaps") {
+                                    // Drop baked normal/metalness/roughness maps so the surface is perfectly
+                                    // smooth. The 17 Pro Max frame maps add a grainy white sparkle on edges that
+                                    // fights the flat satin-anodized "Cosmic Orange" finish we want.
+                                    if (v) {
+                                        m.normalMap = null;
+                                        m.roughnessMap = null;
+                                        m.metalnessMap = null;
+                                    }
+                                } else if (k === "anodized") {
+                                    // Swap the baked frame maps for the shared anodized grain maps.
+                                    // v = { repeat:[u,v], normalScale:n, fine?:bool }. fine=true uses the
+                                    // single-octave map (smooth back panel); default uses the grainy 2-octave one.
+                                    const { normalMap, roughnessMap } = getAnodizedMaps(v.fine);
+                                    const nm = normalMap.clone();
+                                    const rm = roughnessMap.clone();
+                                    nm.wrapS = nm.wrapT = THREE.RepeatWrapping;
+                                    rm.wrapS = rm.wrapT = THREE.RepeatWrapping;
+                                    const rep = v.repeat || [14, 26];
+                                    nm.repeat.set(rep[0], rep[1]);
+                                    rm.repeat.set(rep[0], rep[1]);
+                                    nm.needsUpdate = rm.needsUpdate = true;
+                                    m.normalMap = nm;
+                                    m.roughnessMap = rm;
+                                    m.metalnessMap = null;
+                                    if (m.normalScale)
+                                        m.normalScale.set(v.normalScale ?? 0.12, v.normalScale ?? 0.12);
                                 } else if (
                                     (k === "color" || k === "emissive") &&
                                     m[k]
