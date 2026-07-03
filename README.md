@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://quentin-pla.github.io/phone-mockup-studio/"><img src="screenshots/app-desktop.png" width="49%" alt="Phone Mockup Studio running on desktop" /></a>
+  <a href="https://quentin-pla.github.io/phone-mockup-studio/"><img src="screenshots/app-desktop.png" width="100%" alt="Phone Mockup Studio running on desktop" /></a>
 </p>
 
 <h1 align="center">Phone Mockup Studio</h1>
