@@ -2472,8 +2472,8 @@
                 // the live window size/aspect (so a narrow phone viewport can't clip it). Then crop to the phone.
                 const liveW = wrap.clientWidth,
                     liveH = wrap.clientHeight;
-                const W = 1400,
-                    H = 2000; // fixed portrait export frame
+                const W = 2800,
+                    H = 4000; // fixed portrait export frame (2x for higher-res PNG export)
                 const prevBg = scene.background;
                 const prevAspect = camera.aspect;
                 const prevZoom = camera.zoom;

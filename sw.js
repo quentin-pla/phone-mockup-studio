@@ -1,6 +1,6 @@
 // Service worker for Phone Mockup Studio — offline app shell + on-demand asset caching.
 // Bump CACHE when any precached file changes so old copies are evicted.
-const CACHE = "phone-mockup-studio-v69";
+const CACHE = "phone-mockup-studio-v70";
 const PRECACHE = [
     "./",
     "./index.html",
